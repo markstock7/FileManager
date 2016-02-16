@@ -1,0 +1,13 @@
+{
+  "name": "cloudPanel",
+  "version": "0.0.0",
+  "directory": "bower_components",
+  "description": "cloudPanel can manage all the could for you",
+  "dependencies": {
+    "jquery": "~2.2.0",
+    "jquery-ui": "~1.11.4",
+    "underscore": "~1.8.3",
+    "jquery-tmpl": "*",
+    "jsrender": "^0.9.72"
+  }
+}

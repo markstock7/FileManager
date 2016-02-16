@@ -1,0 +1,827 @@
+ *{
+     font: 12px/1.5 tahoma,arial,"宋体";
+ }
+ a{
+    color: #06c;
+    text-decoration: none;
+}
+
+.oss-icon-small{
+    background: url(./icon/icons.gif) 9999px 9999px no-repeat;
+    width:20px;
+}
+.oss-icon-small.icon_mp3{
+    background-position: -193px -80px;
+}
+.oss-icon-small.icon_dir{
+    background-position: -2px 0px;
+}
+.oss-icon-small.icon-zip{
+    background-position: -349px 81px;
+}
+.oss-icon-small.icon_image{
+    background-position: -2px -80px;
+}
+.oss-icon-small.icon_txt { 
+    background-position: -162px -80px;
+}
+
+
+
+/** General icon */
+.oss-icon {
+    display: inline-block;
+    min-width: 20px;
+    min-height: 20px;
+    background: url(../icon/btn_icon.gif) no-repeat;
+}
+.oss-icon-s{
+    display: inline-block;
+    min-width: 10px;
+    min-height: 10px;
+    background: url(../icon/btn_icon.gif) no-repeat;
+}
+.oss-icon.share:hover{
+    background-position: -182px -59px;  /** x + 31 */
+}
+.oss-icon.share{
+    background-position: -208px -230px;
+}
+.oss-icon.blank{
+    background-position: -111px 3px;
+}
+.oss-icon.check{
+    background-position: -111px -16px;
+}
+.oss-icon.blank_b {
+    background-position: 0 -311px;
+}
+.oss-icon.check_b {
+    background-position: 0px -346px;
+}
+.oss-icon.download{
+    background-position: -207px -210px;
+}
+.oss-icon.download:hover{
+    background-position: -181px -39px;  /** x + 31 */
+}
+.oss-icon.download-light{
+    background-position: -207px -485px;
+}
+.oss-icon.download-light:hover{
+    background-position: -182px -37px;  /** x + 31 */
+}
+.oss-icon.more{
+    background-position: -208px -351px;
+}
+.oss-icon.more:hover{
+    background-position: -182px -308px;
+}
+.oss-icon.createfile{
+    background-position: 0 -416px;
+}
+.oss-icon.createfile:hover{
+    background-position: 0 -448px;
+}   
+.oss-icon.bucket{
+    background-position: -0px -59px;
+    width: 24px
+}
+.oss-icon.folder{
+    background-position: -0px -224px;
+    width: 24px;
+}
+.oss-icon.upload{
+    background-position: -180px -280px;
+    width: 24px;
+}
+.oss-icon.delete{
+    background-position: -156px -128px;
+}
+.oss-icon.delete:hover{
+    background-position: -230px -150px;
+}
+.oss-icon.list{
+    background-position: -65px -237px;
+    width: 33px;
+    height: 29px;
+}
+.oss-icon.list-selected{
+    background-position: -65px -268px;
+    width: 33px;
+    height: 29px;
+}
+.oss-icon.grid{
+    background-position: -98px -268px;
+    width: 33px;
+    height: 29px;
+}
+.oss-icon.grid-selected{
+    background-position: -98px -237px;
+    width: 33px;
+    height: 29px;
+}
+.oss-icon.grid:hover{
+    background-position: -121px -141px;
+    width: 33px;
+    height: 29px;
+}
+.oss-icon.list:hover{
+    background-position: -88px -140px;
+    width: 33px;
+    height: 29px;
+}
+.oss-icon.drapout{
+    background-position: -207px -417px;
+}
+.oss-icon.drapout:hover{
+    background-position: -227px -417px;
+}
+.oss-icon-s.plus{
+    background-position: -237px -265px;
+    height: 11px;
+    width: 11px;
+}
+.oss-icon-s.minus{
+    background-position: -237px -247px;
+    height: 11px;
+    width: 11px;
+}
+.oss-icon-s.smile{
+    background-position: -237px -265px;
+    height: 11px;
+    width: 11px;
+}
+.oss-icon-s.close{
+    background-position: -276px -42px;
+    width: 25px;
+    height: 25px;
+}
+.oss-icon-s.close:hover{
+    background-position: -251px -42px;
+    width: 25px;
+    height: 25px;
+}
+.oss-icon.server {
+    background-position: -181px 3px;
+    width: 24px;
+}
+.oss-icon.server-offline {
+    background-position: -157px 3px;
+    width: 24px;
+}
+.oss-icon.online {
+    background-position: -267px -211px;
+}
+   
+
+
+
+
+.clearfix{clear:both;}
+.clearfix:before { clear:both ;content: '' ;display: block;}
+.clearfix:after{ clear:both ;content: '' ;display: block;}
+
+.ossUploadWrapper{
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1050;
+    overflow: hidden;
+    -webkit-overflow-scrolling: touch;
+    outline: 0;
+    background: rgba(0,0,0,0.3);
+
+}
+.ossUpload{
+    position: relative;
+    margin: 30 auto;
+    width:1400px;
+    -webkit-box-shadow: 0 2px 3px rgba(0,0,0,0.125);
+    box-shadow: 0 2px 3px rgba(0,0,0,0.125);
+    background-color: #fff;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;    outline: 0;
+    -webkit-box-shadow: 0 3px 9px rgba(0,0,0,.5);
+    box-shadow: 0 3px 9px rgba(0,0,0,.5);
+}
+
+.ossUploadSide{
+    float: left;
+    width: 220px;
+    height: 600px;
+    background: #3D3D3D;
+    border-right-width: 1px;
+    border-right-style: solid;
+    border-right-color: #ccc;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    padding: 0 0 10px 0;
+    box-sizing: border-box;
+    overflow: auto;
+}
+.ossUploadBody{
+    position:relative;
+    width:auto;
+    margin-left:220px;
+    height:600px;
+    background-color: #fff;
+    z-index: 200;
+}
+.ossUploadBody-head{
+    min-height: 16.43px;
+    padding: 15px;
+    border-bottom: 2px solid #e5e5e5;
+}
+.oss-titile{
+    margin:0px;
+    font-weight: bolder;
+    font-size: 18px;
+    color: #666;
+
+}
+.ossUploadClose{
+    float: right;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    cursor:pointer;
+}
+.ossUploadBody-content{
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    height: 100%;
+    padding-bottom: 50px;
+}
+
+
+
+.ossUploadBody-foot{
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    height: 50px;
+    border-top: 1px solid #BFC7B7;
+    width: 100%;
+    background-color: #fff;
+
+}
+.ossUploadBody-foot .ossReportBox {
+    font-size: 16px;
+    margin: 13px 0;
+    padding-left:10px;
+    display: none;
+}
+.ossUploadBody-foot .ossReportBox .ossReport-name {
+    font-weight: bolder;
+    color: #0066CC;
+    margin-right: 10px;
+    font-size: 14px;
+}
+.ossUploadBody-foot .ossReportBox .ossReport-value {
+    color:#333;
+}
+
+
+
+
+.ossFolder-list {
+    list-style: none;
+    margin: 0px;
+    padding: 0px;
+}
+.ossFolder{
+    font-size: 13px;
+    color: #333;
+    cursor: pointer;
+    position: relative;
+}
+.activeFolder.select-placeholder{
+    display: block;
+}
+.currentFolder.select-placeholder{
+   display: block;
+}
+.select-placeholder {
+    height: 23px;
+    position: absolute;
+    display: none;
+    /* top: 0px; */
+    margin-top: 3px;
+    width: 200px;
+    background: #217ADC;
+    filter: alpha(opacity=20);
+    opacity: 0.3;
+    padding: 0 5px;
+}
+
+.select-placeholder.active{
+    display:block;
+}
+
+.folder-icon{
+    margin-right: 3px;
+    position: relative;
+    top: 4px;
+}
+.ossFolder .ossFolder{
+    padding-left: 13px;
+}
+.ossFolderCreate {
+    font-size: 13px;
+    color: #333;
+    cursor: pointer;
+    position: relative;
+    padding-left: 26px;
+    top:2px;
+    display:none;
+    min-width: 180px;
+}
+
+
+.folder-collapse { 
+    color: #999;
+    position: relative;
+}
+.folder-name {
+    position:relative;
+}
+.folder-name .edit-name{
+    height: 23px;
+    position: absolute;
+    margin: 0px;
+    top: -6px;
+    left: 0px;
+    display:none;
+}
+.folder-name .edit-name .edit-name-box{
+    width: 130px;
+}
+
+
+
+/** crumb **/
+.oss-module-crumbs {
+    padding: 5px 0;
+    position: relative;
+    z-index: 95;
+}
+.oss-module-crumbs .ossCrumbs{
+    display:none;
+    padding: 0 0 0 25px;
+    color: rgb(0, 102, 204);
+}
+.oss-module-crumbs .ossCrumbs .crumb-item{
+    display: inline-block;
+    max-width: 120px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    vertical-align: top;
+   
+}
+.oss-module-crumbs .ossCrumbs .crumb-item-span{
+    color:#333;
+}
+.oss-module-crumbs .ossCrumbs .crumb-item.current{
+    color:#333;
+}
+.oss-module-crumbs .ossCrumbs-status{
+    float:right;
+    margin-right:20px;
+}
+
+
+.oss-module-toolbar{
+    position: relative;
+    z-index: 99;
+}
+.oss-module-toolbar .oss-bar{
+    border-bottom: 1px solid #d2d2d2;
+    background: #F7F7F7 left -53px repeat-x;
+    padding: 10px 0px;
+}
+.oss-module-toolbar .oss-bar .toolbar-grid-view{
+    float:right;
+    margin-right: 20px;
+}
+.oss-module-toolbar .oss-bar .toolbar-list-view{
+    float:right;
+
+}
+.oss-module-toolbar .tool:hover{
+    color:red;
+}
+/** 上传按钮 */
+.oss-module-toolbar .oss-bar .toolbar-upload{
+    position:relative;
+    display: inline-block;
+    height: 28px;
+    line-height: 26px;
+    line-height: 29px\9;
+    color: #666;
+    vertical-align: middle;
+    margin: 0 0 0 5px;
+    _position: relative;
+    _top: 12px;
+    padding: 0 10px;
+    color: #fff;
+    border-radius: 2px;
+    background-color: #1A71D3;
+    margin-left: 15px;
+    background: -webkit-linear-gradient(top,#1778E6,#5399E8);
+    background: -moz-linear-gradien(top,#1778E6,#5399E8);
+    background: linear-gradient(top,#1778E6,#5399E8);
+}
+.oss-module-toolbar .oss-bar .toolbar-upload input{
+    position: absolute;
+    width: 95px;
+    height: 28px;
+    left: 0px;
+    filter: alpha(opacity=00);
+    opacity: 0;
+}
+.oss-module-toolbar .oss-bar .toolbar-upload .oss-icon{
+    position:relative;
+    top:3px;
+}
+
+.oss-module-toolbar .oss-bar .toolbar-new-dir{
+    display: inline-block;
+}
+.oss-module-toolbar .oss-bar .toolbar-new-dir .oss-icon{
+    width: 65px;
+    height: 28px;
+    line-height: 26px;
+    line-height: 29px\9;
+    padding-left: 31px;
+    color: #666;
+    vertical-align: middle;
+    margin: 0 0 0 5px;
+
+}
+
+
+/** Module List View **/
+.oss-module-list-view {
+    display:none;
+    position: relative;
+    width: 100%;
+    padding-left: 20px;
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
+    height: 100%;
+    padding-bottom: 77px;
+
+}
+.list-view-home {
+    width: 100%;
+    text-align: left;
+    border-collapse: collapse;
+    display: block;
+    overflow: auto;
+    height: 100%;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+.list-view-title{
+        display: block;
+}
+.list-view-home .list-view-title tr {
+    height: 40px;
+    line-height: 41px; 
+    border-bottom: 1px solid #D2D2D2;
+    border-top: 1px solid #D2D2D2;
+    border-left: 1px solid #d2d2d2;
+    background: #F7F7F7;
+    cursor: pointer;
+    width:100%;
+        left: -1px;
+}
+.list-view-home tr th {
+    padding-left:10px;
+}
+.view-list-content {
+        display: block;
+    overflow: auto;
+    height: 100%;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    height: inherit;
+    width:100%;
+}
+.oss-module-list-view  .list {
+    position: relative;
+    border-bottom: 1px solid #D2D2D2;
+    display: block;
+    cursor: pointer;
+    width: 100%;
+    height: 40px;
+
+}
+.view-list-content .list.item_active {
+    background-color:rgb(242, 247, 255);
+}
+.view-list-content .list.item_check {
+    background-color:rgb(242, 247, 255);
+}
+.oss-module-list-view .oss-list-check {
+    display: inline-block;
+    position: relative;
+    top: 5px;
+}
+.view-list-content .list.item_active .oss-list-action{
+    display:block !important;
+    cursor:pointer;
+}
+.oss-module-list-view .list th{
+    position:relative;
+    display: block;
+    height:40px;
+}
+.oss-module-list-view .list .col1 {
+        width: 60%;
+        float:left;
+        padding: 5px 0 11px 4;
+            box-sizing: border-box;
+
+}
+.oss-module-list-view .list .col2{
+    width: 20%;
+    box-sizing: border-box;
+    float: left;
+    padding: 9px 0;
+}
+.oss-module-list-view .list .col3{
+    box-sizing: border-box;
+    float: left;
+    padding: 9px 0;
+}
+.view-list-content .list .col1 .oss-list-action{
+    position: absolute;
+    display:none ;
+    top: 0px;
+    right: 15px;
+    height: 38px;
+    background-color: #f0f8fd;
+}
+.view-list-content .list .col1 .oss-list-action .action{
+    display: inline-block;
+    height: 20px;
+    width: 20px;
+    margin: 10px 0 0 5px;
+}
+.view-list-content .list .col1 .oss-list-action .action.more-wrapper{
+    position:relative;
+}
+.view-list-content .list .col1 .oss-list-action .action.more-wrapper .more-list{
+    top: auto;
+    bottom: 25px;
+}
+.view-list-content .list .col1 .oss-list-action .action.more-wrapper .more-list-up{
+    position: absolute;
+    top: 19px;
+    left: -37px;
+    width: 100px;
+    text-align: center;
+    background: none repeat scroll 0 0 #FFF;
+    border: 1px solid #CFCFCF;
+    box-shadow: 0 2px 3px #CFCFCF;
+    border-radius: 3px;
+    text-indent: 0;
+    display: none;
+    z-index: 9999;
+    height: 112px;
+
+}
+.view-list-content .list .col1 .oss-list-action .action.more-wrapper .more-list-up .more-item{
+    display: block;
+    color: #666;
+    display: block;
+    border-bottom: 1px solid #E7E7E7;
+    line-height: 27px;
+    background:inherit;
+
+}
+.view-list-content .list .col1 .oss-list-action .action.more-wrapper .more-list-up .more-item:hover{
+    background-color: #f0f8fd
+}
+.view-list-content .oss-list-filename {
+    margin-left: 5px;
+}
+.view-list-content .oss-list-icon{
+    position: relative;
+    display:inline-block;
+    top: 4px;
+    padding: 0 3px;
+    height:20px;
+}
+
+
+
+
+
+
+.oss-module-context-menu ul{
+    list-style: none;
+    padding: 5px 5px;
+    padding: 4px 0;
+    width: 100px;
+    position: fixed;
+    background: #fefefe;
+    -webkit-box-shadow: 0 2px 2px rgba(0,0,0,.1);
+    box-shadow: 0 2px 2px rgba(0,0,0,.1);
+    -moz-border-radius: 2px;
+    -webkit-border-radius: 2px;
+    -khtml-border-radius: 2px;
+    border-radius: 2px;
+    border: 1px solid #d2d2d2;
+    z-index: 100;
+    _position: absolute;
+    display:none;
+}
+.oss-module-context-menu li{
+    padding-left: 17px;
+    text-align: left;
+    color: #666;
+    display: block;
+    border-bottom: 1px solid #E7E7E7;
+    line-height: 27px;
+    background: inherit;
+    cursor: pointer;
+}
+.oss-module-context-menu  li:hover{
+    background: #f0f8fd;      
+}
+.menu-folder{
+    left:100px;
+    top:100px;
+}
+
+
+
+.oss-module-check-actions {
+    position: relative;
+    height: 50px;
+    padding: 10px 0;
+    box-sizing: border-box;
+    display:none;
+}
+.oss-module-check-actions .text{
+    margin:0 10px 0 30px;
+}
+
+.oss-module-check-actions a{
+    display: inline-block;
+    padding: 0px 13px;
+    color: #333;
+    height: 28px;
+    border-radius: 2px;
+    background: #F0F0F0;
+    cursor: pointer;
+    border: 1px solid #A8A8A8;
+    color:#666;    
+    margin-right: 10px;
+}
+.oss-module-check-actions a:hover{
+    color:#1A71D3;
+}
+.oss-module-check-actions a .oss-icon{
+    position: relative;
+    top: 3px;
+    margin-right: 5px;
+}
+
+
+
+
+.oss-module-upload {
+    position: absolute;
+    width: 700px;
+    right: 0px;
+    bottom: 0px;
+    z-index: 999;
+    background: #fff;
+    border-top: 1px solid #ccc;
+    border-left: 1px solid #ccc;
+    outline: 0;
+    -webkit-box-shadow: 0 3px 9px rgba(0,0,0,.5);
+    box-shadow:  0 3px 9px rgba(0,0,0,.5);
+    display:none;
+
+}
+.oss-module-upload .upload-title {
+    padding: 8px 5px;
+    border-bottom: 1px solid #ccc;
+    background: #3E8BE3;
+    color: #fff;
+
+}
+.oss-module-upload .upload-title .close{
+    position: absolute;
+    right: 20px;
+    background-position: -110px -76px;
+}
+.oss-module-upload .upload-list-wrapper{
+    height: 400px;
+    overflow: auto;
+    position:relative;
+}
+.oss-module-upload .upload-list {
+    overflow-y: auto;
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+.oss-module-upload .upload-list .upload-list-head {
+    border-bottom: 1px solid #ccc;
+}
+.oss-module-upload .upload-list tr{
+    height:35px;
+    border-bottom: 1px solid #ccc;
+}
+.oss-module-upload .upload-list tr th{
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.oss-module-upload .upload-list tr th.list-placehoder{
+    position: absolute;
+    height: 32px;
+    background: #3E8BE3;
+    z-index: 888;
+    left: -2px;
+    opacity: .2;
+}
+.oss-module-upload .upload-list tr th.o-name{
+    width:40%;
+}
+.oss-module-upload .upload-list tr th.o-folder{
+    width:30%;
+    color: #3E8BE3;
+}
+.oss-module-upload .upload-list tr th.o-size{
+    width:10%;
+    text-indent: 1em;
+    color: #3E8BE3;
+}
+.oss-module-upload .upload-list tr th.o-status{
+    width:20%;
+    color:#3E8BE3;
+}
+
+
+
+.oss-module-grid-view {
+    display:block;
+    width: 100%;
+    box-sizing: border-box;
+    height: 100%;
+    padding-bottom: 77px;
+}
+.oss-module-grid-view .grid-view-content{
+    height: 100%;
+    overflow: auto;
+}
+.oss-module-grid-view .grid {
+    width: 100px;
+    margin: 5px 7px;
+    text-align: center;
+    position: relative;
+    display:inline-block;
+}
+.oss-module-grid-view .grid .grid-image{
+    width: 100px;
+    height: 100px;
+    display: table-cell;
+    vertical-align: middle;
+    border: 1px solid #ccc;
+}
+.oss-module-grid-view .grid .grid-image img {
+    max-width: 100px;
+    max-height: 100px;
+    vertical-align: middle;
+    width: 100px;
+}
+.oss-module-grid-view .grid .grid-name {
+        display: block;
+    text-overflow: ellipsis;
+    white-space: normal;
+    overflow: hidden;
+    height: 1.5rem;
+}
+.oss-module-grid-view .grid .grid-check{
+    position: absolute;
+    top: 0px;
+    overflow:pointer;
+}

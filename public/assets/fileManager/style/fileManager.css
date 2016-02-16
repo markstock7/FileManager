@@ -1,0 +1,809 @@
+.fManagerWrapper {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1050;
+  overflow: hidden;
+  outline: 0;
+  background: rgba(0, 0, 0, 0.3);
+}
+.fManagerWrapper .clearfix {
+  clear: both;
+}
+.fManagerWrapper .clearfix:before {
+  clear: both ;
+  content: '';
+  display: block;
+}
+.fManagerWrapper .clearfix:after {
+  clear: both ;
+  content: '';
+  display: block;
+}
+.fManagerWrapper * {
+  font: 12px/1.5 tahoma, arial, "宋体";
+}
+.fManagerWrapper .fm-icon {
+  background: url(../icon/btn_icon.gif) 9999px 9999px no-repeat;
+  display: inline-block;
+  background-position: 0px 0px;
+  min-width: 20px;
+  min-height: 20px;
+  cursor: pointer;
+}
+.fManagerWrapper .fm-icon.fm-icon-sure {
+  background-position: 0 -512px;
+  width: 22px;
+  height: 22px;
+}
+.fManagerWrapper .fm-icon.fm-icon-cancel {
+  background-position: -27px -512px;
+  width: 22px;
+  height: 22px;
+}
+.fManagerWrapper .fm-icon.list {
+  background-position: -65px -237px;
+  width: 33px;
+  height: 29px;
+}
+.fManagerWrapper .fm-icon.list-selected {
+  background-position: -65px -268px;
+  width: 33px;
+  height: 29px;
+}
+.fManagerWrapper .fm-icon.grid {
+  background-position: -98px -268px;
+  width: 33px;
+  height: 29px;
+}
+.fManagerWrapper .fm-icon.grid-selected {
+  background-position: -98px -237px;
+  width: 33px;
+  height: 29px;
+}
+.fManagerWrapper .fm-icon.createfile {
+  background-position: 0 -416px;
+  width: 65px;
+  height: 28px;
+  line-height: 26px;
+  line-height: 29px\9;
+  padding-left: 31px;
+  color: #666;
+  vertical-align: middle;
+  margin: 0 0 0 5px;
+}
+.fManagerWrapper .fm-icon.createfile:hover {
+  background-position: 0 -448px;
+}
+.fManagerWrapper .fm-icon.log {
+  background-position: -280px -156px;
+}
+.fManagerWrapper .fm-icon.log:hover {
+  background-position: -280px -181px;
+}
+.fManagerWrapper .fm-icon.log.selected {
+  background-position: -280px -181px;
+}
+.fManagerWrapper .fm-icon.upload-list {
+  background-position: -257px -156px;
+}
+.fManagerWrapper .fm-icon.upload-list:hover {
+  background-position: -257px -181px;
+}
+.fManagerWrapper .fm-icon.upload-list.selected {
+  background-position: -257px -181px;
+}
+.fManagerWrapper .fm-icon.upload {
+  background-position: -180px -280px;
+  width: 24px;
+}
+.fManagerWrapper .fm-icon.blank {
+  background-position: -111px 3px;
+}
+.fManagerWrapper .fm-icon.check {
+  background-position: -111px -16px;
+}
+.fManagerWrapper .fm-icon.blank_b {
+  background-position: 0 -311px;
+}
+.fManagerWrapper .fm-icon.check_b {
+  background-position: 0px -346px;
+}
+.fManagerWrapper .fm-icon.close {
+  background-position: -276px -42px;
+  width: 25px;
+  height: 25px;
+}
+.fManagerWrapper .fm-icon.close:hover {
+  background-position: -251px -42px;
+  width: 25px;
+  height: 25px;
+}
+.fManagerWrapper .fm-icon.delete {
+  background-position: -156px -128px;
+}
+.fManagerWrapper .fm-icon.delete:hover {
+  background-position: -230px -150px;
+}
+.fManagerWrapper .fm-icon.download {
+  background-position: -207px -210px;
+}
+.fManagerWrapper .fm-icon.download:hover {
+  background-position: -181px -39px;
+  /** x + 31 */
+}
+.fManagerWrapper .fm-icon.download-light {
+  background-position: -207px -485px;
+}
+.fManagerWrapper .fm-icon.download-light:hover {
+  background-position: -182px -37px;
+  /** x + 31 */
+}
+.fManagerWrapper .fm-icon.drapout {
+  background-position: -207px -417px;
+}
+.fManagerWrapper .fm-icon.drapout:hover {
+  background-position: -227px -417px;
+}
+.fManagerWrapper .object-icon {
+  background: url(../icon/icons.gif) 9999px 9999px no-repeat;
+  display: inline-block;
+  background-position: 0px 0px;
+  width: 20px;
+}
+.fManagerWrapper .object-icon.icon-mp3 {
+  background-position: -193px -80px;
+}
+.fManagerWrapper .object-icon.icon-dir {
+  background-position: -2px 0px;
+}
+.fManagerWrapper .object-icon.icon-zip {
+  background-position: -349px 81px;
+}
+.fManagerWrapper .object-icon.icon-image {
+  background-position: -2px -80px;
+}
+.fManagerWrapper .object-icon.icon-txt {
+  background-position: -162px -80px;
+}
+.fManagerWrapper .object-large-icon {
+  background: url(../icon/large_icon.png) 9999px 9999px no-repeat;
+  display: inline-block;
+  width: 92px;
+  height: 92px;
+  background-position: 0px 0px;
+}
+.fManagerWrapper .object-large-icon.large-icon-zip {
+  background-position: -154px 0px;
+}
+.fManagerWrapper .object-large-icon.large-icon-txt {
+  background-position: -1074px 0px;
+}
+.fManagerWrapper .object-large-icon.large-icon-dir {
+  background-position: -615px -117px;
+}
+.fManager {
+  position: relative;
+  width: 1400px;
+  margin: 30px auto;
+  background-color: #fff;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  outline: 0;
+  -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+}
+.fManager .fManager-head {
+  min-height: 16.43px;
+  padding: 15px;
+  border-bottom: 2px solid #e5e5e5;
+}
+.fManager .fManager-head .fManager-title {
+  margin: 0px;
+  font-weight: bolder;
+  font-size: 18px;
+  color: #666;
+}
+.fManager .fManager-head .fManager-close {
+  float: right;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1;
+  color: #000;
+  text-shadow: 0 1px 0 #fff;
+  cursor: pointer;
+}
+.fManager .fManagerContent .fManagerSider {
+  float: left;
+  width: 220px;
+  height: 600px;
+  background: #fff;
+  border-right: 1px solid #ccc;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  padding: 0 0 10px 0;
+  box-sizing: border-box;
+  overflow: auto;
+}
+.fManager .fManagerContent .fManagerBody {
+  position: relative;
+  width: auto;
+  margin-left: 220px;
+  height: 600px;
+  background-color: #fff;
+  z-index: 200;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  height: 100%;
+  padding-bottom: 50px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-toolbal {
+  position: relative;
+  z-index: 99;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-toolbal .fM-bar {
+  border-bottom: 1px solid #d2d2d2;
+  background: #F7F7F7 left -53px repeat-x;
+  padding: 10px 0px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-toolbal .fM-bar .toolbar-grid-view {
+  float: right;
+  margin-right: 20px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-toolbal .fM-bar .toolbar-list-view {
+  float: right;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-toolbal .fM-bar .toolbar-upload {
+  position: relative;
+  display: inline-block;
+  height: 28px;
+  line-height: 26px;
+  line-height: 29px\9;
+  color: #666;
+  vertical-align: middle;
+  margin: 0 0 0 15px;
+  _position: relative;
+  _top: 12px;
+  padding: 0 10px;
+  color: #fff;
+  border-radius: 2px;
+  background-color: #1A71D3;
+  background: -webkit-linear-gradient(top, #1778E6, #5399E8);
+  background: -moz-linear-gradien(top, #1778E6, #5399E8);
+  background: linear-gradient(top, #1778E6, #5399E8);
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-toolbal .fM-bar .toolbar-upload .file-upload {
+  position: absolute;
+  width: 95px;
+  height: 28px;
+  left: 0px;
+  filter: alpha(opacity=00);
+  opacity: 0;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-toolbal .fM-bar .toolbar-upload .fm-icon {
+  position: relative;
+  top: 3px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-toolbal .fM-bar .toolbar-new-dir {
+  position: relative;
+  display: inline-block;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-toolbal .fM-bar .toolbar-new-dir .new-dir-box {
+  display: none;
+  width: 230px;
+  height: 26px;
+  position: absolute;
+  top: 0px;
+  left: 110px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-toolbal .fM-bar .toolbar-new-dir .new-dir-box .object-icon {
+  height: 20px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-toolbal .fM-bar .toolbar-new-dir .new-dir-box .box {
+  height: 28px;
+  margin: 0px;
+  vertical-align: middle;
+  border: 1px solid #D2D2D2;
+  background: #fff;
+  padding: 0px;
+  display: block;
+  float: left;
+  padding: 0 4px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-toolbal .fM-bar .toolbar-new-dir .new-dir-box .sure {
+  display: inline-block;
+  margin: 3px 5px;
+  cursor: pointer;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-toolbal .fM-bar .toolbar-new-dir .new-dir-box .cancel {
+  display: inline-block;
+  margin: 3px 5px 3px 0;
+  cursor: pointer;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-curmbs {
+  padding: 5px 0;
+  position: relative;
+  z-index: 95;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-curmbs .crumbs {
+  padding: 0 0 0 25px;
+  color: #0066cc;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-curmbs .crumbs .crumb-item {
+  display: inline-block;
+  max-width: 120px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  vertical-align: top;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-curmbs .crumbs .crumb-item .crumb-item.current {
+  color: #333;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-curmbs .crumbs-status {
+  float: right;
+  margin-right: 20px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-list-view {
+  position: relative;
+  width: 100%;
+  padding-left: 20px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  height: 100%;
+  padding-bottom: 77px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-list-view .list-view-table {
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+  display: block;
+  overflow: auto;
+  height: 100%;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-list-view .list-view-table .list-view-head {
+  display: block;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-list-view .list-view-table .list-view-head tr {
+  height: 40px;
+  line-height: 41px;
+  border-bottom: 1px solid #D2D2D2;
+  border-top: 1px solid #D2D2D2;
+  border-left: 1px solid #d2d2d2;
+  background: #F7F7F7;
+  cursor: pointer;
+  width: 100%;
+  left: -1px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-list-view .list-view-table .list {
+  position: relative;
+  border-bottom: 1px solid #D2D2D2;
+  display: block;
+  cursor: pointer;
+  width: 100%;
+  height: 40px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-list-view .list-view-table .list .col1 {
+  width: 60%;
+  float: left;
+  padding: 9px 0 9px 4px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-list-view .list-view-table .list .col1 .list-action {
+  position: absolute;
+  display: none ;
+  top: 0px;
+  right: 15px;
+  height: 38px;
+  background-color: #f0f8fd;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-list-view .list-view-table .list .col1 .list-action .action {
+  display: inline-block;
+  height: 20px;
+  width: 20px;
+  margin: 10px 0 0 5px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-list-view .list-view-table .list .col1 .list-action .action.more-wrapper {
+  position: relative;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-list-view .list-view-table .list .col1 .list-action .action.more-wrapper .more-list {
+  top: auto;
+  bottom: 25px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-list-view .list-view-table .list .col1 .list-action .action.more-wrapper .more-list-up {
+  position: absolute;
+  top: 19px;
+  left: -37px;
+  width: 100px;
+  text-align: center;
+  background: none repeat scroll 0 0 #FFF;
+  border: 1px solid #CFCFCF;
+  box-shadow: 0 2px 3px #CFCFCF;
+  border-radius: 3px;
+  text-indent: 0;
+  display: none;
+  z-index: 9999;
+  height: 112px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-list-view .list-view-table .list .col1 .list-action .action.more-wrapper .more-list-up .more-item {
+  display: block;
+  color: #666;
+  border-bottom: 1px solid #E7E7E7;
+  line-height: 27px;
+  background: inherit;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-list-view .list-view-table .list .col1 .list-action .action.more-wrapper .more-list-up .more-item:hover {
+  background-color: #f0f8fd;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-list-view .list-view-table .list .col2 {
+  width: 20%;
+  float: left;
+  padding: 9px 0;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-list-view .list-view-table .list .col3 {
+  float: left;
+  padding: 9px 0;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-list-view .list-view-table .list th {
+  position: relative;
+  display: block;
+  height: 40px;
+  box-sizing: border-box;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-list-view .list-view-table .list .list-filename {
+  margin-left: 5px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-list-view .list-view-table .list .list-icon {
+  position: relative;
+  display: inline-block;
+  top: 4px;
+  padding: 0 3px;
+  height: 20px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-list-view .list-view-table .list.item_active,
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-list-view .list-view-table .list.item_check {
+  background-color: #f2f7ff;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-list-view .list-view-table .list-view-content {
+  display: block;
+  overflow: auto;
+  height: 100%;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  height: inherit;
+  width: 100%;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-list-view .list-view-table .list-view-content .list.item_active .list-action {
+  desplay: block !important;
+  cursor: pointer;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-grid-view {
+  display: block;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding-bottom: 77px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-grid-view .grid-view-content {
+  height: 100%;
+  overflow: auto;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-grid-view .grid-view-content .grid {
+  display: inline-block;
+  position: relative;
+  text-align: center;
+  width: 142px;
+  height: 122px;
+  line-height: 0;
+  float: left;
+  margin: 4px 4px 0 0;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-grid-view .grid-view-content .grid.grid-active .thumb-large,
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-grid-view .grid-view-content .grid.contextActive .thumb-large {
+  border: 2px solid #2e80dc;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-grid-view .grid-view-content .grid.grid-active .grid-check,
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-grid-view .grid-view-content .grid.contextActive .grid-check {
+  display: block;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-grid-view .grid-view-content .grid .thumb-large {
+  width: 90px;
+  height: 92px;
+  overflow: hidden;
+  margin: 0 auto;
+  border: 2px solid #fff;
+  position: relative;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-grid-view .grid-view-content .grid .grid-name {
+  display: block;
+  text-overflow: ellipsis;
+  white-space: normal;
+  overflow: hidden;
+  line-height: 28px;
+  height: 28px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-grid-view .grid-view-content .grid .grid-check {
+  position: absolute;
+  top: 0px;
+  overflow: pointer;
+  display: none;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-grid-view .grid-view-content .grid .node-edit-name {
+  margin-top: 3px;
+  display: none;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-grid-view .grid-view-content .grid .node-edit-name .box {
+  width: 80px;
+  display: block;
+  float: left;
+  margin-left: 4px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-context-menu ul {
+  list-style: none;
+  padding: 5px 5px;
+  padding: 4px 0;
+  width: 100px;
+  position: fixed;
+  background: #fefefe;
+  -webkit-box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  -khtml-border-radius: 2px;
+  border-radius: 2px;
+  border: 1px solid #d2d2d2;
+  -index: 100;
+  _position: absolute;
+  display: none;
+  z-index: 9999;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-context-menu ul li {
+  padding-left: 17px;
+  text-align: left;
+  color: #666;
+  display: block;
+  border-bottom: 1px solid #E7E7E7;
+  line-height: 27px;
+  background: inherit;
+  cursor: pointer;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-context-menu ul li:hover {
+  background: #f0f8fd;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-upload {
+  position: absolute;
+  width: 700px;
+  right: 0px;
+  bottom: 0px;
+  z-index: 999;
+  background: #fff;
+  border-top: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+  outline: 0;
+  -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+  display: none;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-upload .upload-title {
+  padding: 8px 5px;
+  border-bottom: 1px solid #ccc;
+  background: #3E8BE3;
+  color: #fff;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-upload .upload-title .close {
+  position: absolute;
+  right: 20px;
+  background-position: -110px -76px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-upload .upload-list-wrapper {
+  height: 400px;
+  overflow: auto;
+  position: relative;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-upload .upload-list-wrapper .upload-list {
+  overflow-y: auto;
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-upload .upload-list-wrapper .upload-list tr {
+  height: 35px;
+  border-bottom: 1px solid #ccc;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-upload .upload-list-wrapper .upload-list tr th {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-upload .upload-list-wrapper .upload-list tr th.list-placeholder {
+  position: absolute;
+  height: 32px;
+  background: #3E8BE3;
+  z-index: 888;
+  left: -2px;
+  opacity: .2;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-upload .upload-list-wrapper .upload-list tr th.u-name {
+  width: 40%;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-upload .upload-list-wrapper .upload-list tr th.u-folder {
+  width: 30%;
+  color: #3E8BE3;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-upload .upload-list-wrapper .upload-list tr th.u-size {
+  width: 10%;
+  text-indent: 1em;
+  color: #3E8BE3;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-upload .upload-list-wrapper .upload-list tr th.u-status {
+  width: 20%;
+  color: #3E8BE3;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-log {
+  position: absolute;
+  right: 20px;
+  bottom: 51px;
+  width: 400px;
+  height: 200px;
+  border: 1px solid #D2D2D2;
+  border-bottom-width: 0px;
+  background-color: #fff;
+  display: none;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-log .log-head {
+  height: 30px;
+  background: #F7F7F7;
+  line-height: 30px;
+  padding-left: 10px;
+  color: #333;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-log .log-list {
+  height: 150px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-log .log.success {
+  color: green;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-log .log.error {
+  color: red;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-content .fM-module-log .log.sys {
+  color: blue;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-foot {
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
+  height: 50px;
+  width: 100%;
+  border-top: 1px solid #BFC7B7;
+  background-color: #fff;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-foot .fM-module-checkAction {
+  position: relative;
+  height: 50px;
+  padding: 10px 0;
+  box-sizing: border-box;
+  display: none;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-foot .fM-module-checkAction .text {
+  margin: 0 10px 0 30px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-foot .fM-module-checkAction a {
+  display: inline-block;
+  padding: 0 13px;
+  color: #333;
+  height: 28px;
+  border-radius: 2px;
+  background: #F0F0F0;
+  cursor: pointer;
+  border: 1px solid #a8a8a8;
+  color: #666;
+  margin-right: 10px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-foot .fM-module-checkAction a:hover {
+  color: #1A71D3;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-foot .fM-module-checkAction a .fm-icon {
+  position: relative;
+  top: 3px;
+  margin-right: 5px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-foot .tool {
+  display: inline-block;
+  position: absolute;
+  right: 40px;
+  top: 15px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-foot .process-log {
+  display: inline-block;
+  margin-right: 20px;
+}
+.fManager .fManagerContent .fManagerBody .fManagerBody-foot .upload-list {
+  display: inline-block;
+}
+.ServiceList {
+  padding: 0 0 0 10px;
+  margin: 0;
+}
+.ServiceList li {
+  list-style-type: none;
+}
+.ServiceList .fnode-children {
+  padding: 0px;
+  display: none;
+}
+.ServiceList .fnode-list {
+  font-size: 13px;
+  color: #333;
+  cursor: pointer;
+  position: relative;
+}
+.ServiceList .fnode-list .select-placeholder,
+.ServiceList .fnode-list .draggable-placeholder {
+  position: absolute;
+  display: none;
+  margin-top: 3px;
+  width: 200px;
+  height: 23px;
+  background: #217ADC;
+  filter: alpha(opacity=20);
+  opacity: 0.3;
+  padding: 0 5px;
+}
+.ServiceList .fnode-list .activeNode.select-placeholder,
+.ServiceList .fnode-list .currentNode.select-placeholder,
+.ServiceList .fnode-list .contextActive.select-placeholder {
+  display: block;
+}
+.ServiceList .fnode-list .select-placeholder.active {
+  display: block;
+}
+.ServiceList .fnode-list .fnode-icon {
+  margin-right: 3px;
+  position: relative;
+  top: 4px;
+}
+.ServiceList .fnode-list .fnode-collapse {
+  color: #999;
+  position: relative;
+}
+.ServiceList .fnode-list .fnode-name {
+  position: relative;
+}
+.ServiceList .fnode-list .node-edit-name {
+  position: absolute;
+  display: none;
+  height: 23px;
+  top: 3px;
+  left: 55px;
+}
+.ServiceList .fnode-list .node-edit-name input.box {
+  padding: 0px;
+  height: 100%;
+}
+.ServiceList .fnode-list .nodeCreateBox {
+  position: relative;
+  display: none;
+  font-size: 13px;
+  color: #333;
+  padding-left: 26px;
+  cursor: pointer;
+  top: 2px;
+  min-width: 180px;
+}
+.ServiceList .fnode-list .fnode-list {
+  padding-left: 13px;
+}
