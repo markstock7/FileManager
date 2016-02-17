@@ -57,6 +57,7 @@ LocalCloud = function LocalCloud(settings) {
         buckets = [];
     this.settings = settings;
     this.buckets = {};
+    console.log(settings);
     if(buckets) {
         for(i = 0, len = buckets.length; i < len; i++) {
             bucket = buckets[i];
