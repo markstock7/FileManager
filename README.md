@@ -1,11 +1,14 @@
 #Usage
   打开core/server/config/fileManager.config.js 可以进行bucket配置，容器根目录设置
-  
+
   默认的容器为根目录下localCloudStore
-  
+
   命令行下输入 npm start, 然后在浏览器中打开http://localhost:3001/
 
+#TODO
+  图片显示，下载文件部分还没有做，
 
+  文件拖拽复制移动正在处理中
 #Service 配置
 前台通过service和后端相应的api进行交互，每个service接口都应该遵循相应的规格，查看 <<服务器端接口配置>>
 
