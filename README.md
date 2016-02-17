@@ -3,7 +3,13 @@
 
   默认的容器为根目录下localCloudStore
 
-  命令行下输入 npm start, 然后在浏览器中打开http://localhost:3001/
+  bower install
+
+  npm install
+
+  npm start
+
+  然后在浏览器中打开http://localhost:3001/
 
 #TODO
   图片显示，下载文件部分还没有做，
