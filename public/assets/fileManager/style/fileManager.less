@@ -30,8 +30,8 @@
         background: url(../icon/btn_icon.gif) 9999px 9999px no-repeat;
         display: inline-block;
         background-position: -0px -0px;
-        min-width: 20px;
-        min-height: 20px;
+        width: 20px;
+        height: 20px;
         cursor: pointer;
 
         &.fm-icon-sure {
@@ -146,8 +146,15 @@
         &.drapout:hover{
             background-position: -227px -417px;
         }
-
-
+        &.folder{
+            background-position: -0px -224px;
+            width: 24px;
+        }
+        &.plus{
+            background-position: -237px -265px;
+            height: 11px;
+            width: 11px;
+        }
     }
 
     // 小文件图标
@@ -781,6 +788,7 @@
                     padding: 10px 0;
                     box-sizing: border-box;
                     display: none;
+                    width: 600px;
 
                     .text{
                         margin: 0 10px 0 30px;
@@ -899,5 +907,6 @@
     }
     .fnode-list .fnode-list{
         padding-left: 13px;
+        width: 100%;
     }
 }

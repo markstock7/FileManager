@@ -44,11 +44,36 @@ localCloudController = {
             return localCloudModel.addFolder(object, options);
         }
 
+        return pipeline([doTask], object, options).then(function(newFOlderKey) {
+            return {newFOlderKey: newFOlderKey};
+        });
+    },
+
+    reNameObject: function reNameObject(object, options) {
+        function doTask(object, options) {
+            return localCloudModel.reNameObject(object, options);
+        }
+        return pipeline([doTask], object, options).then(function(newKey) {
+            return {newKey: newKey};
+        });
+    },
+
+    deleteObject: function deleteObject(object, options) {
+        function doTask(object, options) {
+            return localCloudModel.deleteObject(object, options);
+        }
         return pipeline([doTask], object, options).then(function() {
             return 'ok';
         });
+    },
+
+    mvObject: function mvObject(object, options) {
+        function doTask(object, options) {
+            return localCloudModel.mvObject(object, options);
+        }
+        return pipeline([doTask], object, options).then(function(toNewKey) {
+            return {toNewKey: toNewKey};
+        });
     }
-
-
 };
 module.exports = localCloudController;

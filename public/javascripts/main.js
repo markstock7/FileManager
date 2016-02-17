@@ -29,21 +29,20 @@ $(function() {
             },
 
             // keys的删除均以队列的形式一一删除，
-            deleteObjects: {
+            deleteObject: {
                 method: 'DELETE',
-                endpoint: '/api/localCloud/objects'
+                endpoint: '/api/localCloud/object'
                 // post deleteObjects;
+            },
+            reNameObject: {
+                method: 'PUT',
+                endpoint: '/api/localCloud/object'
+            },
+
+            mvObject: {
+                method: 'POST',
+                endpoint: '/api/localCloud/object'
             }
-
-
-
-            // createFolder: '/api/cloud/local/createFolder',
-            // createObject: '',
-
-            // deleteFolder: '/api/cloud/local/deleteFolder',
-            // deleteObjects: '/api/cloud/local/deleteObjects',
-
-            // reNameObject: '/api/cloud/local/reNameObject',
 
             // uploadObjects: '/api/cloud/local/uploadObjects'
 

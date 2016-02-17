@@ -151,7 +151,7 @@ LocalCloud.prototype.listFolders = function listFolders(options) {
                         if(fs.statSync(path.join(options.keyPath, file)).isDirectory()) {
                             folders.push({
                                 Key: path.join(options.key, file, '/'),
-                                Name: file + '/'
+                                Name: file,
                             });
                         }
                     });
@@ -179,7 +179,7 @@ LocalCloud.prototype.listObjects = function listObjects(options) {
                         if(stat.isDirectory()) {
                             objects.folders.push({
                                 Key: path.join(options.key, file, '/'),
-                                Name: file + '/',
+                                Name: file,
                                 LastModified: stat.mtime
                             });
                         } else if(stat.isFile()) {
@@ -197,38 +197,41 @@ LocalCloud.prototype.listObjects = function listObjects(options) {
 };
 
 LocalCloud.prototype.addFolder = function addFolder(object, options) {
-    var params = ['bucket', 'key'], newFolderPath, _this = this;
-    return this.validateOptions(options, params, 'folder')
-        .then(function then(options) {
+    var params = ['bucket', 'key', 'newFolderName'], newFolderPath, _this = this;
+    return this.validateOptions(object, params, 'folder')
+        .then(function then(object) {
             return validateName(object, 'newFolderName')
                 .then(function(){
                     // 开始创建
-                    newFolderPath = path.join(options.keyPath, object['newFolderName']);
-                    return fs.mkdirAsync(newFolderPath, _this.settings.mode);
+                    newFolderPath = path.join(object.keyPath, object['newFolderName']);
+                    return fs.mkdirAsync(newFolderPath, _this.settings.mode)
+                        .then(function() {
+                            return path.join(object.key, object['newFolderName'], '/');
+                        });
                 });
         });
 };
 
-LocalCloud.prototype.deleteObjects = function deleteObjects(options) {
+LocalCloud.prototype.deleteObject = function deleteObject(object) {
     var params = ['bucket', 'key'], _this = this;
     // options = options || {};
     // options.keys = object.key || '';
-    return this.validateOptions(options, params)
-        .then(function(options) {
-            if(_.isEmpty(object.keys) || !_.isString(object.keys))
+    return this.validateOptions(object, params)
+        .then(function(object) {
+            if(_.isEmpty(object.key) || !_.isString(object.key))
                 return Promise.reject(new errors.ValidationError('Invalid key'));
             // 开始删除keys
-            if(options.stat && options.stat.isDirectory()) {
+            if(object.stat && object.stat.isDirectory()) {
                 if(_this.settings.deleteMode === 'strict') {
                     // delete in strict mode
-                    return rirmafPromise(options.keyPath);
+                    return rirmafPromise(object.keyPath);
                 } else if(_this.settings.deleteMode === 'normal') {
                     // delete in normal mode
-                    return fs.rmdirAsync(options.keyPath);
+                    return fs.rmdirAsync(object.keyPath);
                 }
-            } else if(options.stat && options.stat.isFile()) {
+            } else if(object.stat && object.stat.isFile()) {
                 // we are tryint to delete a file
-                return rirmafPromise(options.keyPath);
+                return rirmafPromise(object.keyPath);
             } else {
                 // other kind of fill not allow to delte
                 return Promise.reject('forbidden');
@@ -236,5 +239,62 @@ LocalCloud.prototype.deleteObjects = function deleteObjects(options) {
         });
 }
 
+LocalCloud.prototype.reNameObject = function reNameObject(object, options) {
+    var params = ['bucket', 'key', 'fromName', 'toName'], _this = this;
+    return this.validateOptions(object, params)
+        .then(function(object) {
+            var fromKey = path.join(object.keyPath, object.fromName),
+                toKey = path.join(object.keyPath, object.toName);
+            return fs.renameAsync(fromKey, toKey)
+                .then(function() {
+                    return path.join(object.key, object.toName);
+                });
+        });
+}
 
+LocalCloud.prototype.mvObject = function mvObject(object, options) {
+    var params = ['bucket', 'toKey', 'fromKey'],
+        toKeyPath,
+        fromKeyPath,
+        toKeyStat,
+        fromKeyStat,
+        fromKeyBase
+        _this = this;
+    return this.validateOptions(object, params)
+        .then(function(object) {
+            toKeyPath = path.join(object.bucket.path, object.toKey);
+            if(!(new RegExp("^" + _this.settings.rootPath).test(toKeyPath))) {
+                return Promise.reject(new errors.ValidationError('can not reach that place: '+toKeyPath));
+            }
+
+            fromKeyPath = path.join(object.bucket.path, object.fromKey);
+            if(!(new RegExp("^" + _this.settings.rootPath).test(fromKeyPath))) {
+                return Promise.reject(new errors.ValidationError('can not reach that place: '+toKeyPath));
+            }
+
+            if(!fs.existsSync(toKeyPath)) {
+                return Project.reject(new errors.ValidationError(toKeyPath + ' is not exist'));
+            } else {
+                toKeyStat = fs.statSync(toKeyPath);
+                if(!toKeyStat.isDirectory()) {
+                    return Project.reject(new erors.ValidationError(toKeyPath + ' must be a directory'));
+                }
+            }
+
+            if(!fs.existsSync(fromKeyPath)) {
+                return Project.reject(new errors.ValidationError(fromKeyPath + 'is not exist'));
+            } else {
+                fromKeyStat = fs.statSync(fromKeyPath);
+                fromKeyBase = path.basename(fromKeyPath);
+            }
+
+            toKeyPath = path.join(toKeyPath, fromKeyBase);
+            return fs.renameAsync(fromKeyPath, toKeyPath)
+                .then(function() {
+                    return toKeyPath;
+                });
+
+
+        });
+}
 module.exports = new LocalCloud(config.localCloudSettings);

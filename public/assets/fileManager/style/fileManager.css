@@ -29,8 +29,8 @@
   background: url(../icon/btn_icon.gif) 9999px 9999px no-repeat;
   display: inline-block;
   background-position: 0px 0px;
-  min-width: 20px;
-  min-height: 20px;
+  width: 20px;
+  height: 20px;
   cursor: pointer;
 }
 .fManagerWrapper .fm-icon.fm-icon-sure {
@@ -146,6 +146,15 @@
 }
 .fManagerWrapper .fm-icon.drapout:hover {
   background-position: -227px -417px;
+}
+.fManagerWrapper .fm-icon.folder {
+  background-position: 0px -224px;
+  width: 24px;
+}
+.fManagerWrapper .fm-icon.plus {
+  background-position: -237px -265px;
+  height: 11px;
+  width: 11px;
 }
 .fManagerWrapper .object-icon {
   background: url(../icon/icons.gif) 9999px 9999px no-repeat;
@@ -697,6 +706,7 @@
   padding: 10px 0;
   box-sizing: border-box;
   display: none;
+  width: 600px;
 }
 .fManager .fManagerContent .fManagerBody .fManagerBody-foot .fM-module-checkAction .text {
   margin: 0 10px 0 30px;
@@ -806,4 +816,5 @@
 }
 .ServiceList .fnode-list .fnode-list {
   padding-left: 13px;
+  width: 100%;
 }

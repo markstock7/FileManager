@@ -43,7 +43,8 @@
                         case 'tar':
                         case 'gz':
                             return 'zip';
-
+                        case 'folder':
+                            return 'folder';
                         default:
                             return 'txt';
                     }
@@ -55,8 +56,8 @@
              * @param flag {boolean} true 为大图标, false 为小图标
              */
             return function(suffix, flag) {
-                if (!suffix)
-                    icon = iconMap.folder;
+                if (suffix === '')
+                    icon = iconMap.text;
                 else
                     icon = iconMap[convertSuffix(suffix)];
                 if (flag)
@@ -74,6 +75,7 @@
          */
         getSuffix = function getSuffix(name) {
             var ret = fileNameRegexp.exec(name);
+            console.log(name, ret);
             if (ret.length > 1) {
                 if (ret[3] === undefined) {
                     return '';
@@ -81,6 +83,7 @@
                     return ret[4];
                 }
             }
+
             return '';
         },
 
@@ -242,10 +245,10 @@
                             <div class="select-placeholder"></div> \
                             <div class="draggable-placeholder"></div> \
                             <span class="fnode-collapse"> \
-                                <span class="oss-icon-s plus"></span> \
+                                <span class="fm-icon plus"></span> \
                             </span> \
                             <span class="fnode-icon"> \
-                                <span class="oss-icon folder"></span> \
+                                <span class="fm-icon folder"></span> \
                             </span> \
                             <span class="fnode-name">{{:Name}}</span> \
                             <div node-type="edit-name" class="node-edit-name"> \
@@ -253,7 +256,7 @@
                             </div> \
                             <div class="nodeCreatebox" style="display:none"> \
                                 <span class="fnode-icon"> \
-                                    <span class="oss-icon folder"></span> \
+                                    <span class="fm-icon folder"></span> \
                                 </span> \
                                 <input type="text" placeholder="新建文件夹" class="newNodeInput"> \
                             </div> \
@@ -491,6 +494,10 @@
             return /^[^\\/?%*:|"<>\.]+$/.test(value);
         },
 
+        /**
+         * 记录操作记录
+         * @Usage logger('message', type)
+         */
         logger;
 
     // 上传类
@@ -601,6 +608,9 @@
             // 获取buckets
             listBuckets: {},
 
+            // 创建目录
+            createFolder: {},
+
             // 删除bucket
             deleteBucket: {},
 
@@ -660,6 +670,8 @@
 
     /**
      * 获取buckets
+     *
+     * @return Promise
      */
     Service.prototype.getBuckets = function() {
         var service = this;
@@ -672,12 +684,12 @@
     /**
      * 根据当前的bucket 和 key获取objects
      *
-     * @param bucket object key所属的bucket的信息
-     * @param string key    所需要查找的key
+     * @param bucket {Object} key所属的bucket的信息
+     * @param key {String}   所需要查找的key
+     * @return Promise
      */
     Service.prototype.getObjects = function(bucket, key) {
         var service = this;
-        console.log(bucket);
         return $.ajax({
             url: service.config.server + service.config.listObjects.endpoint,
             type: service.config.listObjects.method,
@@ -692,12 +704,12 @@
     /**
      * 根据当前的bucket 和 key获取folders
      *
-     * @param bucket object key所属的bucket的信息
-     * @param string key    所需要查找的key
+     * @param bucket {Object} key所属的bucket的信息
+     * @param key {String}    所需要查找的key
+     * @return Promise
      */
     Service.prototype.getFolders = function(bucket, key) {
         var service = this;
-        console.log(bucket, key);
         return $.ajax({
             url: service.config.server + service.config.listFolders.endpoint,
             type: service.config.listFolders.method,
@@ -723,8 +735,9 @@
             data: {
                 bucket: bucket.Name,
                 key: key,
-                Addition: bucket.Addition
-            }
+                Addition: bucket.Addition,
+                newFolderName: value
+            },
         });
     };
 
@@ -749,15 +762,16 @@
      * 重命名一个object,
      *
      */
-    Service.prototype.reNameObject = function(bucket, srcKey, dstKey) {
+    Service.prototype.reNameObject = function(bucket, key, fromName, toName) {
         var service = this;
         return $.ajax({
-            url: service.config.server + service.config.renameObject.endpoint,
-            type: service.config.renameObject.method,
+            url: service.config.server + service.config.reNameObject.endpoint,
+            type: service.config.reNameObject.method,
             data: {
                 bucket: bucket.Name,
-                srcKey: srcKey,
-                dstKey: dstKey,
+                key: key,
+                fromName: fromName,
+                toName: toName,
                 Addition: bucket.Addition
             }
         });
@@ -767,14 +781,14 @@
      *
      * 删除指定的keys
      */
-    Service.prototype.deleteObjects = function(bucket, keys) {
+    Service.prototype.deleteObject = function(bucket, key) {
         var service = this;
         return $.ajax({
-            url: service.config.server + service.config.deleteObjects.endpoint,
-            type: service.config.deleteObjects.method,
+            url: service.config.server + service.config.deleteObject.endpoint,
+            type: service.config.deleteObject.method,
             data: {
                 bucket: bucket.Name,
-                keys: keys || [],
+                key: key,
                 Addition: bucket.Addition
             }
         });
@@ -1014,45 +1028,60 @@
         return this.__cache[id];
     };
 
-    // 创建一个fid的子节点
-    Tree.prototype.CreateNode = function(fid, newNodeValue) {
-        var tree = this;
+    /**
+     * 创建一个新的节点(创建目录)
+     *
+     * @param fid {String} 父目录的id
+     * @param newNodeValue {String} 新节点名称(目录名)
+     * @return Promise
+     */
+    Tree.prototype.createNode = function(fid, newNodeValue) {
+        var tree = this,
+            node,
+            service,
+            bucket,
+            key,
+            defer;
         node = tree.find(fid);
-        // 不允许在service下创建bucket
-        if (node.type === 'Service')
+        if (node.type === 'Service') {
+            loggger('Service下不能创建目录', 'error');
             return;
-        var service = tree.find(node.ServiceId),
-            bucket = tree.find(node.BucketId),
-            key = node.Key,
-            defer = $.Deferred();
-        // 为了保证安全，后台还必须对key进行进一步验证，
-        if (!isFolder(node.Key)) {
-            defer.reject();
-        } else {
-            newNodeValue = fMtrim(newNodeValue) + '/';
-            service.createFolder(bucket, node.Key, newNodeValue)
-                .done(function(response) {
-                    // 添加进当前节点
-                    //只有当前节点的子节点为开启状态才插入dom
-                    if (node.children_status === true) {
-                        tree.insertNode(node, {
-                            Key: node.Key + newNodeValue,
-                            Name: newNodeValue
-                        })
-                    }
-                    defer.resolve();
-                })
-                .fail(function(err) {
-                    // 此处应该提醒错误
-                    defer.reject(err);
-                });
         }
+        service = tree.find(node.ServiceId);
+        bucket = tree.find(node.BucketId);
+        key = node.Key;
+        defer = $.Deferred();
+        newNodeValue = fMtrim(newNodeValue);
+
+        // 调用service的createFolder 创建目录
+        service.createFolder(bucket, node.Key, newNodeValue)
+            .done(function(response) {
+                //只有当前节点的子节点为开启状态才插入dom
+                if (node.children_status === true) {
+                    tree.insertNode(node, {
+                        Key: response.newFOlderKey,
+                        Name: newNodeValue
+                    });
+                }
+                logger('目录' + newNodeValue + '创建成功', 'success');
+                defer.resolve();
+            })
+            .fail(function(error) {
+                logger(formatError(error), 'error');
+                defer.reject(err);
+            });
         return defer.promise();
     };
 
-    // 在parent的子节点中插入一个新的节点
+    /**
+     * 在parent的子节点中插入一个新的节点
+     *
+     * @param parent {Object} 父节点
+     * @param data {Object} 新节点数据(key， name)
+     */
     Tree.prototype.insertNode = function(parent, data) {
         var tree = this,
+            tmpl,
             newNode = {
                 type: 'Folder',
                 __ID: generateId(),
@@ -1064,56 +1093,71 @@
                 Name: data.Name || (resolveKeyName(folder.Key)).name,
                 toggle: 'close',
                 children: []
-            },
-            tmpl = '';
+            };
         parent.children.push(newNode);
         tree.__cache[newNode.__ID] = newNode;
-        tmpl += TemplateEngine(Template.FolderList, newNode);
-        $('#flist-' + parent.__ID + ' .fnode-children').first().prepend(tmpl).draggable()
+        tmpl = Template.FolderList.render(newNode);
+        $('#flist-' + parent.__ID + ' .fnode-children').first().prepend(tmpl).draggable();
     }
 
     /**
      * 重命名一个节点
      *
+     * @param fid {String} 要修改的节点id
+     * @param newNodeValue {String} 新节点名称(目录名)
+     * @return Promise
      */
-    Tree.prototype.renameNode = function(fid, new_name) {
+    Tree.prototype.renameNode = function(fid, toName) {
             var tree = this,
                 node = tree.find(fid),
-                defer = $.Deferred();
+                parent_node,
+                defer = $.Deferred(),
+                service,
+                bucket,
+                fromName,
+                toName,
+                fromName = node.Name,
+                key;
             if (node && node.type === 'Folder') {
-                new_name = fMtrim(new_name, '/');
-                if (isLegalFolderName(new_name)) {
-                    var originalKey = rfMtrim(node.Key, '/'),
-                        targetKey,
-                        key = originalKey.split('/'),
-                        service = tree.find(node.ServiceId),
-                        bucket = tree.find(node.BucketId);
-                    key[key.length - 1] = new_name;
-                    targetKey = key.join('/');
-                    service.reNameObject(bucket, originalKey, targetKey)
-                        .done(function(response) {
-                            node.Name = new_name;
-                            tree.__renameNode(node, targetKey + '/');
-                            $('#flist-' + node.__ID).find('.fnode-name:first').text(new_name);
-                            defer.resolve(node);
-                        })
-                        .fail(function(err) {
-                            defer.reject();
-                        });
-
-
+                if (isLegalFolderName(toName)) {
+                    parent_node = tree.find(node.ParentId);
+                    service = tree.find(node.ServiceId);
+                    bucket = tree.find(node.BucketId);
+                    if(!parent_node || !service || !bucket) {
+                        logger('文件夹名称修改发生异常', 'error');
+                        defer.reject();
+                    } else {
+                        service.reNameObject(bucket, parent_node.Key, fromName, toName)
+                            .done(function(response) {
+                                node.Name = toName;
+                                // 递归修改其子节点的key
+                                tree.__renameNode(node, response.newKey + '/');
+                                $('#flist-' + node.__ID).find('.fnode-name:first').text(toName);
+                                logger('目录名修改成功: ' + fromName + ' -> ' + toName, 'success');
+                                defer.resolve(node);
+                            })
+                            .fail(function(err) {
+                                defer.reject();
+                                logger('目录名修改失败: ' + fromName + ' -> ' + toName, 'error');
+                            });
+                    }
                 } else {
+                    logger('非法的文件夹名: '+toName, 'error');
                     defer.reject();
-                    //throw new Error('非法的文件名');
                 }
             } else {
+                // 修改文件名
                 defer.reject();
-                //throw new Error('Can\'t Rename Bucket or Service');
             }
             return defer.promise();
     }
 
-    // 修改包括自己和孩子在内的子节点的key
+    /**
+     * 修改包括自己和孩子在内的子节点的key
+     *
+     * @param rnode {Object} 起始节点
+     * @param key {String} 起始节点key
+     */
     Tree.prototype.__renameNode = function(rnode, key) {
         var oldkey = rnode.Key,
             oldkeylen = oldkey.length;
@@ -1136,35 +1180,39 @@
         var tree = this,
             node = tree.find(fid);
 
+        if (!node) {
+            logger('无法查找到目录' + fid, 'error');
+            return;
+        }
         // 只能删除目录，不允许删除bucket和service
         if (node.type === 'Folder') {
-            if (!node) {
-                alert('Can\'t find the Folder.');
-                return;
-            }
+
             var service = tree.find(node.ServiceId),
                 bucket = tree.find(node.BucketId);
             if (service && bucket) {
-
                 // 调用其服务删除其节点
-                service.deleteFolder(bucket, node.Key).done(function(response) {
+                service.deleteObject(bucket, node.Key).done(function(response) {
                     //开始删除其节点
                     tree.__deleteNode(node);
+                    logger('目录删除成功: ' + node.Name, 'success');
                     if (cd)
                         cd(true);
 
                 }).fail(function(err) {
+                    logger('目录删除失败: ' + node.Name, 'error');
                     if (cd)
                         cd(false);
                 });
+            } else {
+                logger('无法获取Service 或 Bucket', 'error');
             }
         } else {
-            alert('Can \'t delete Bucket or Service.');
+            logger('无法删除Bucket 或 Service', 'error');
         }
     };
 
     /**
-     * 从树中删除节点
+     * 从树中删除节点 及其子节点
      * @param object | string | int dnode 要删除的节点
      *
      */
@@ -1672,9 +1720,6 @@
             };
         }());
 
-        //上传控件事件
-        //plugin.module.UploadModule。delegate('')
-
     };
 
     /**
@@ -1684,7 +1729,42 @@
         logger('开始初始化事件');
         var plugin = this,
             options = plugin.options,
-            modules = plugin.modules;
+            modules = plugin.modules,
+            tree = Tree.instance();
+
+        /**
+         * 删除object
+         *
+         * @param key {String} 要删除的object的key
+         * @param callback {Function} 回调函数
+         */
+         function deleteObject(key, callback) {
+             var node = tree.resolveNodeFromKey(key),env;
+             if(node) {
+                   if(node.type !== 'Folder') {
+                       logger('无法删除service 或 bucket', 'error');
+                   } else {
+                       tree.deleteNode(node.__ID, function(ret) {
+                          if(callback)
+                              callback();
+                       });
+                   }
+              } else {
+                   env = tree.resolveEnv();
+                   env.service.deleteObject(env.bucket, key)
+                       .done(function() {
+                           logger('文件 '+key+'删除成功', 'success');
+                       })
+                       .fail(function(error) {
+                           logger(formatError(error), 'error');
+                       })
+                       .complete(function() {
+                           if(callback) {
+                               callback();
+                           }
+                       });
+              }
+        };
 
         /**
          * 目录点击事件
@@ -1711,7 +1791,7 @@
 
              // 避免多次加载
              if (elem.attr('data-status') === 'loading') {
-                 alert('正在加载中，请稍等');
+                 logger('正在加载中，请稍等', 'error');
                  return;
              } else if (elem.attr('data-status') === 'loaded' && is_toggle) {
                  if (type === 'Service')
@@ -1787,7 +1867,7 @@
                      }
                  }
              }
-             toggleCheckActions();
+             plugin.toggleCheckActions();
          });
 
          // 避免折叠事件冒泡
@@ -1867,16 +1947,15 @@
                  case 'moveto':
 
                  case 'rename':
-                     var editnameElem = listNodeElem.find('.node-edit-name:first');
+                     var editnameElem = listNodeElem.find('.node-edit-name').first();
                      toggleEditNameBox(editnameElem);
                      break;
                  case 'createnew':
-                     var createNewElem = listNodeElem.find('.nodeCreateBox:first');
+                     var createNewElem = listNodeElem.find('.nodeCreatebox:first');
                      createNewElem.show();
                      folderContext.elem.hide();
                      createNewElem.find('.newNodeInput')[0].focus();
                      break;
-
              }
          });
 
@@ -1885,32 +1964,32 @@
              var elem = $(this),
                  editnameElem = elem.closest('.node-edit-name'),
                  nameValElem = editnameElem.prev('.fnode-name'),
+                 newName = fMtrim(elem.val()),
                  node = elem.closest('.fnode-list');
-             if (rfMtrim(elem.val(), '/') === rfMtrim(nameValElem.text(), '/') || elem.val() === '') {
+             if(fMtrim(elem.val()) === fMtrim(nameValElem.text()) || newName === '') {
                  toggleEditNameBox(editnameElem);
              } else {
-                 tree.renameNode(node.attr('data-fid'), elem.val()).then(function(response) {
-                     nameValElem.text(elem.val());
-                     toggleEditNameBox(editnameElem);
-                 }, function(err) {
-                     // 出错直接不修改
-                     toggleEditNameBox(editnameElem);
-                 });
+                 tree.renameNode(node.attr('data-fid'), newName)
+                    .then(function(response) {
+                        nameValElem.text(newName);
+                        toggleEditNameBox(editnameElem);
+                    }, function(error) {
+                        toggleEditNameBox(editnameElem);
+                    });
              }
          });
 
          // 新建文件夹输入框失去焦点
          modules.siderElem.delegate('.nodeCreatebox .newNodeInput', 'blur', function(e) {
              var elem = $(this),
-                 newNodeValue = elem.val();
+                 newNodeValue = elem.val(),
+                 fid;
              if (newNodeValue === '') {
-                 elem.closest('.nodeCreateBox').hide();
+                 elem.closest('.nodeCreatebox').hide();
              } else {
-                 var fid = elem.closest('.fnode-list').attr('data-fid');
-                 tree.CreateNode(fid, newNodeValue).then(function(response) {
-                     elem.closest('.nodeCreateBox').hide();
-                 }, function(err) {
-                     //此处不处理
+                 fid= elem.closest('.fnode-list').attr('data-fid');
+                 tree.createNode(fid, newNodeValue).then(function(response) {
+                     elem.closest('.nodeCreatebox').hide();
                  });
              }
          });
@@ -1921,17 +2000,6 @@
                  key = elem.attr('data-path');
              plugin.refreshView(key);
          });
-
-         // object选中事件
-         function toggleCheckActions() {
-             var num = modules.checkAction.items.length;
-             if (num) {
-                 modules.checkAction.elem.show()
-                 modules.checkAction.elem.find('.text span:first').text(num);
-             } else {
-                 modules.checkAction.elem.hide();
-             }
-         };
 
          // 列表视图文件选择
          modules.listView.delegate('.list-check', 'click', function(e) {
@@ -1981,7 +2049,7 @@
                  }
                  list.toggleClass('item_check');
              }
-             toggleCheckActions();
+             plugin.toggleCheckActions();
          });
 
          // 列表视图双击打开目录事件
@@ -2047,55 +2115,47 @@
                          for (var i = 0, len = items.length; i < len; i++) {
                              keys.push(items[i].key);
                          }
-                         if (!keys.length) return;
-                         env.service.deleteObjects(env.bucket, keys)
-                             .done(function(response) {
-                                 // 直接刷新当前视图，并从目录树中删除存在的目录
-                                 var node,
-                                     last = response.last || [];
-                                 $.each(keys, function(i, key) {
+                         if (!keys.length) {
+                             logger('没有要删除的对象', 'error');
+                             return;
+                         };
 
-                                     if (!(key in last)) {
-
-                                         node = tree.resolveNodeFromKey(key);
-                                         console.log(node, key);
-                                         if (node)
-                                             tree.__deleteNode(node.__ID);
-                                     } else {
-                                         // 报告删除失败的key
-                                     }
-
-                                 });
-                                 // 刷新当前视图
-                                 plugin.refreshView();
-                             })
-                             .fail(function() {
-                                 alert('删除失败');
-                             });
+                         key = keys.pop();
+                         deleteObject(key, function next() {
+                            key = keys.pop();
+                            if(key) {
+                                deleteObject(key, next);
+                            } else {
+                                // 全部删除完成刷新视图
+                                plugin.refreshView();
+                            }
+                         });
                      }
                      break;
-                 case 'download':
-                     // 只下载文件不下载目录
-                     var items = plugin.module.checkAction.items,
-                         item;
-                     for (var i = 0, len = items.length; i < len; i++) {
-                         item = items[i];
-                         if (item.address)
-                             download(item.name, item.address);
-                     }
-                     break;
-                 case 'getimage':
-                     if (plugin.viewType === 'list') {
-                         alert('请在grid模式下使用')
-                     } else {
-                         var items = plugin.module.checkAction.items,
-                             item,
-                             datas = [];
-                         for (var i = 0, len = items.length; i < len; i++) {
-                             datas.push(items[i].addr);
-                         }
-                         mkClipBoard(datas);
-                     }
+                // @TODO
+                //  case 'download':
+                //      // 只下载文件不下载目录
+                //      var items = plugin.module.checkAction.items,
+                //          item;
+                //      for (var i = 0, len = items.length; i < len; i++) {
+                //          item = items[i];
+                //          if (item.address)
+                //              download(item.name, item.address);
+                //      }
+                //      break;
+                // @TODO
+                //  case 'getimage':
+                //      if (plugin.viewType === 'list') {
+                //          alert('请在grid模式下使用')
+                //      } else {
+                //          var items = plugin.module.checkAction.items,
+                //              item,
+                //              datas = [];
+                //          for (var i = 0, len = items.length; i < len; i++) {
+                //              datas.push(items[i].addr);
+                //          }
+                //          mkClipBoard(datas);
+                //      }
 
              }
          });
@@ -2210,16 +2270,22 @@
              .delegate('.tool .new-dir-box', 'click', function(e) {
                  e.stopPropagation();
              })
+             // 确认创建新文件夹
              .delegate('.tool .new-dir-box .sure', 'click', function(e) {
                  var elem = $(this),
                      newName = elem.prev('.box').val(),
                      env = tree.resolveEnv(),
                      fid;
                  fid = (env.folder && env.folder.__ID) || env.bucket.__ID;
-                 tree.CreateNode(fid, newName).then(function(response) {
-                     plugin.insertNewFolderToView(newName);
-                 }, function(err) {
-
+                 if(!isLegalFolderName(newName)) {
+                     logger('非法的目录名: ' + newName, 'error');
+                     return;
+                 }
+                 tree.createNode(fid, newName).then(function(response) {
+                    // 刷新视图
+                    plugin.refreshView();
+                    // 关闭窗口
+                    elem.closest('.new-dir-box').toggle().find('.box').val('');
                  });
 
              })
@@ -2257,7 +2323,7 @@
                          }
                      }
                  }
-                 toggleCheckActions();
+                 plugin.toggleCheckActions();
              })
              .delegate('.grid', 'mouseover', function(e) {
                  var elem = $(this);
@@ -2309,6 +2375,7 @@
                      key = grid.attr('data-key'),
                      node,
                      newName = $(this).prev().val(),
+                     oldName,
                      env,
                      srcKey,
                      dstKey;
@@ -2332,13 +2399,17 @@
                          logger('非法的文件名称');
                          return;
                      }
-                     env = tree.resolveEnv(key);
-                     srcKey = key;
-                     dstKey = srcKey.replace(/\/([\s\S]*?)\./, '/' + newName + '.');
-                     console.log(srcKey, dstKey);
-                     env.service.reNameObject(env.bucket, srcKey, dstKey)
+                     oldName = grid.attr('data-name');
+                     env = tree.resolveEnv();
+                     key = env.folder ? env.folder.Key : env.bucket ? env.bucket.Key : '';
+                     if(!key) {
+                         logger('无法在此目录下修改名称', 'error');
+                         return;
+                     }
+                     env.service.reNameObject(env.bucket, key, oldName, newName)
                          .done(function(response) {
-                             grid.find('.grid-name').text(newName + '.' + suffix);
+                             plugin.refreshView();
+                            //  grid.find('.grid-name').text(newName + '.' + suffix);
                              logger(newName + ' 名称修改成功', 'success');
                          })
                          .fail(function(err) {
@@ -2358,6 +2429,7 @@
                  grid   = modules.contextMenu.gridViewContext.currentElem,
                  suffix = grid.attr('data-suffix'),
                  key    = grid.attr('data-key'),
+                 env    = tree.resolveEnv(),
                  node;
              switch (type) {
                  case 'download':
@@ -2370,33 +2442,16 @@
                          name = grid.attr('data-name') || 'noname';
                      if (!address)
                          address = getDownloadAddress(key);
-                     // @TODO 下载接口重现做
+                     // @TODO 下载接口重做
                      download(name, address);
                      break;
                  case 'rename':
                      grid.find('.grid-name').hide().next().show().find('.box').focus();
                      break;
                  case 'delete':
-                     // 可以从目录树中查找到
-                     if (suffix === 'dir' && (node = tree.resolveNodeFromKey(key))) {
-                         tree.deleteNode(node.__ID, function(ret) {
-                             if (ret) {
-                                 grid.remove();
-                             } else {
-                                 alert('删除失败');
-                             }
-                         });
-                     } else {
-                         // 直接调用service删除
-                         var env = tree.resolveEnv(key);
-                         env.service.deleteFolder(env.bucket, key)
-                             .done(function(response) {
-                                 grid.remove();
-                             })
-                             .fail(function(err) {
-                                 alert('删除失败');
-                             });
-                     }
+                     deleteObject(key, function() {
+                         plugin.refreshView();
+                     });
                      break;
              }
              modules.contextMenu.gridViewContext.elem.hide();
@@ -2408,10 +2463,29 @@
              $(this).find('.fm-icon').toggleClass('selected');
          });
 
-
          logger('初始化事件结束');
     };
 
+    // object选中事件
+    Plugin.prototype.toggleCheckActions = function toggleCheckActions() {
+        var plugin = this,
+            modules = plugin.modules;
+        var num = modules.checkAction.items.length;
+        if (num) {
+            modules.checkAction.elem.show()
+            modules.checkAction.elem.find('.text span:first').text(num);
+        } else {
+            modules.checkAction.elem.hide();
+        }
+    };
+
+    // 清空选中项
+    Plugin.prototype.clearCheckActions = function clearCheckActions() {
+        var plugin = this,
+            modules = plugin.modules;
+        modules.checkAction.items.splice(0);
+        plugin.toggleCheckActions();
+    }
 
     Tree.prototype.objectManipulation = function(fromKey, toKey, type) {
         var tree = this,
@@ -2442,37 +2516,6 @@
         }
     }
 
-    Plugin.prototype.insertNewFolderToView = function(name) {
-        if (!name) return;
-        var plugin = this,
-            tree = Tree.instance(),
-            env = tree.resolveEnv(),
-            key = env.folder && env.folder.Key || env.bucket.Key,
-            tmpl;
-        name = fMtrim(name, '/') + '/';
-        key += name;
-        if (plugin.viewType === 'list') {
-            tmpl = TemplateEngine(Template.ModuleListViewLi, {
-                FILE_MODIFIED: '-',
-                FILE_SIZE: '-',
-                ICON: 'icon_dir',
-                FILE_NAME: name, // 兼容oss写法
-                KEY: key // 兼容oss写法
-            });
-            plugin.module.listViewContent.prepend(tmpl);
-        } else if (plugin.viewType === 'grid') {
-            tmpl = TemplateEngine(Template.ModuleGridViewBox, {
-                NAME: name,
-                address: '-',
-                KEY: key,
-                ICON: getIcon(null, 1),
-                SUFFIX: 'dir'
-            });
-            plugin.module.gridViewContent.prepend(tmpl);
-
-        }
-    }
-
     /**
      * 刷新列表视图
      * @param data {Object}
@@ -2483,6 +2526,7 @@
             folder,
             file,
             tmpl = '',
+            suffix,
             data;
         if (!plugin.modules.listView.is(':visible'))
             plugin.modules.listView.show();
@@ -2494,17 +2538,20 @@
                     FILE_SIZE: '-',
                     ICON: 'icon_dir',
                     NAME: folder.Name || folder.Prefix, // 兼容oss写法
-                    KEY: folder.Key || folder.Prefix // 兼容oss写法
+                    KEY: folder.Key || folder.Prefix, // 兼容oss写法
+                    SUFFIX: 'dir'
                 });
             });
 
             $.each(data.files, function(index) {
                 file = data.files[index];
+                suffix = getSuffix(file.Name || file.Key);
+                console.log('suffix = ', suffix);
                 tmpl += Template.ModuleListViewLi.render({
                     FILE_MODIFIED: formatDate(file.LastModified, 'yyyy-MM-dd') || '-',
                     FILE_SIZE: formatFileSize(file.Size) || '-',
                     address: file.address || '-',
-                    ICON: getIcon(getSuffix(file.Name || file.Key)),
+                    ICON: getIcon( suffix || 'txt', 0),
                     NAME: file.Name || file.Key, // oss中的文件key为name
                     KEY: file.Key
                 });
@@ -2513,7 +2560,7 @@
         listContent.empty().append(tmpl);
         // 重置选中项
         plugin.modules.listView.chkallBtn.addClass('blank').removeClass('check');
-        plugin.modules.checkAction.items = [];
+        plugin.clearCheckActions();
     };
 
     /**
@@ -2540,7 +2587,7 @@
                     NAME: folder.Name,
                     address: folder.address || '-',
                     KEY: folder.Key,
-                    ICON: getIcon(null, 1),
+                    ICON: getIcon('folder', 1),
                     SUFFIX: 'dir'
                 });
             });
@@ -2569,7 +2616,8 @@
         }
         gridContent.empty();
         gridContent.append(tmpl);
-        modules.checkAction.items = [];
+
+        plugin.clearCheckActions();
 
         // 添加拖拽事件
         modules.gridViewContent.find('.grid').draggable({
@@ -2577,16 +2625,16 @@
             helper: 'clone'
         });
         modules.gridViewContent.find('.grid').droppable({
-            // activeClass: "ui-state-hover",
             hoverClass: "grid-active",
             drop: function(event, ui) {
                 var from = ui.draggable,
                     fromKey,
                     to = $(this),
                     toKey;
+                // 必须同为grid
                 if (from.hasClass('grid') && to.hasClass('grid')) {
                     // to必须为目录
-                    if (to.attr('data-type') !== 'dir') {
+                    if (to.attr('data-suffix') !== 'dir') {
                         alert('接受项必须为目录');
                     } else {
                         if (from.attr('data-type') === 'dir') {
@@ -2614,13 +2662,23 @@
         if (key && key[0] !== '/') key = '/' + key;
 
         // 此处要重置tree的currentfolder
-        env = tree.resolveEnv(key, true);
-        // 检查所点击项是否为目录
-        if(!env.folder) {
-            logger('非目录不能打开', 'error');
-            return;
+        if(key) {
+            env = tree.resolveEnv(key, true);
+        } else {
+            env = tree.resolveEnv();
         }
-        $('#flist-' + env.folder.__ID).trigger('dblclick');
+
+        if(env.folder) {
+            $('#flist-' + env.folder.__ID).trigger('dblclick');
+        } else if(env.bucket) {
+            $('#flist-' + env.bucket.__ID).trigger('dblclick');
+        } else {
+            logger('非目录不能打开', 'error');
+        }
+
+        // @TODO 删除选中项目
+        plugin.clearCheckActions();
+
     }
 
     // 导出配置接口
