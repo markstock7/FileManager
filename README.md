@@ -1,3 +1,7 @@
+# 截图
+![Alt text](/markstock7/FileManager/blob/master/screenshot/Screen%20Shot%202016-02-17%20at%206.31.26%20PM.png?raw=true)
+
+![Alt text](/markstock7/FileManager/blob/master/screenshot/Screen%20Shot%202016-02-17%20at%206.31.38%20PM.png?raw=true)
 #Usage
   打开core/server/config/fileManager.config.js 可以进行bucket配置，容器根目录设置
 
