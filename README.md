@@ -1,5 +1,6 @@
 # 截图
   查看screenshot 目录
+  ![](http://jslab.oss-cn-hangzhou.aliyuncs.com/Screen%20Shot%202016-02-18%20at%203.08.52%20AM.png)
 #Usage
   打开core/server/config/fileManager.config.js 可以进行bucket配置，容器根目录设置
 
