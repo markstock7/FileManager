@@ -74,6 +74,15 @@ localCloudController = {
         return pipeline([doTask], object, options).then(function(toNewKey) {
             return {toNewKey: toNewKey};
         });
+    },
+
+    uploadFile: function uploadFile(object, options) {
+        function doTask(object, options) {
+            return localCloudModel.uploadFile(object, options);
+        }
+        return pipeline([doTask], object, options).then(function(newFileKey) {
+            return {newFileKey: newFileKey};
+        });
     }
 };
 module.exports = localCloudController;

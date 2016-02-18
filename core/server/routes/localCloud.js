@@ -1,4 +1,6 @@
 var localCloud = require('../controllers/localCloud.controller'),
+    multer = require('multer'),
+    upload = multer({dest: 'uploads/'}),
     apiHeader = require('../utils/header');
 
 module.exports = function(router) {
@@ -20,4 +22,6 @@ module.exports = function(router) {
     // toKey 必须为目录
     // fromkey
     router.post('/api/localCloud/object', apiHeader.http(localCloud.mvObject));
+
+    router.post('/api/localCloud/file',upload.single('file'), apiHeader.http(localCloud.uploadFile))
 };

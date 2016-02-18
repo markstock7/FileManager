@@ -2,8 +2,8 @@ var http, addHeaders, cacheInvalidationHeader, locationHeader,  _ = require('lod
 
 http = function http(apiMethod, keepReq, keepRes) {
     return function apiHandler(req, res, next) {
-        var object  = req.body,
-            options = _.extend({}, req.query, req.params, {});
+        var object  = _.extend({}, req.file,  req.body);
+            options = _.extend({}, req.query, req.params);
         if(keepReq)
           options._req = req;
         if(keepRes)

@@ -39,12 +39,15 @@ $(function() {
                 endpoint: '/api/localCloud/object'
             },
 
-            mvObject: {
+            moveObject: {
                 method: 'POST',
                 endpoint: '/api/localCloud/object'
-            }
+            },
 
-            // uploadObjects: '/api/cloud/local/uploadObjects'
+            createObject: {
+                method: 'POST',
+                endpoint: '/api/localCloud/file'
+            }
 
         }],
 

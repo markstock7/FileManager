@@ -2,7 +2,7 @@
  * jQuery lightweight plugin
  * Original author: @mark stock
  * Email: markstock7@hotmail.com
- * Github page: https://github.com/markstock7/fileManager
+ * Github page: https://github.com/markstock7/FileManager
  * Licensed under the MIT license
  */
 ;(function($, _, document, window, undefined) {
@@ -75,7 +75,6 @@
          */
         getSuffix = function getSuffix(name) {
             var ret = fileNameRegexp.exec(name);
-            console.log(name, ret);
             if (ret.length > 1) {
                 if (ret[3] === undefined) {
                     return '';
@@ -209,7 +208,7 @@
                             '<div class="process-log">' +
                                 '<span class="fm-icon log"></span>' +
                             '</div>' +
-                            '<div class="upload-list">' +
+                            '<div class="upload-list-switch">' +
                                 '<span class="fm-icon upload-list"></span>' +
                             '</div>' +
                             '</div>'+
@@ -374,17 +373,12 @@
             ModuleContextMenu: $.templates('<div class="fM-module-context-menu"> \
                                     <ul class="menu-node"> \
                                         <li data-key="createnew">新建文件夹</li> \
-                                        <li data-key="paste">复制到</li> \
-                                        <li data-key="rename">重命名</li> \
                                         <li data-key="delete">删除</li> \
                                     </ul> \
                                     <ul class="service-node"> \
                                     </ul> \
                                     <ul class="grid-view-context"> \
-                                        <li data-key="download">下载</li> \
                                         <li data-key="rename">重命名</li> \
-                                        <li data-key="rename">复制到</li> \
-                                        <li data-key="delete">移动到</li> \
                                         <li data-key="delete">删除</li> \
                                     </ul>  \
                                     <ul class="list-view-context"> \
@@ -500,17 +494,23 @@
          */
         logger;
 
-    // 上传类
     var Upload = {
-        fileList: [],
-        listElem: null,
-        append: function(files) {
-            var upload = this,
-                tree = Tree.instance(),
-                env = tree.resolveEnv(),
-                fileData;
+        filesList: [],
+        listElem: null
+    };
+    /**
+     * 向上传队列中添加文件
+     *
+     * @param files {Array}
+     */
+    Upload.append = function append(files) {
+        var upload = this,
+            tree = Tree.instance(),
+            env = tree.resolveEnv(),
+            fileData;
+        if(env && env.bucket && env.service && env.key) {
             $.each(files, function(index, file) {
-                var fileData = {
+                fileData = {
                     file: file,
                     service: env.service,
                     bucket: env.bucket,
@@ -518,67 +518,71 @@
                     id: generateId()
                 };
                 upload.insertIntoList(fileData);
-                upload.fileList.push(fileData);
+                upload.filesList.push(fileData);
             });
-            this.run();
-        },
-        run: function() {
-            var file,
-                upload = this;
-            if (upload.ctrl) {
+            upload.run();
+        } else {
+            logger('添加文件失败, 无法解析当前环境', 'error');
+        }
+    };
+
+    Upload.insertIntoList = function insertIntoList(fileData) {
+        var upload = this,
+            tmpl = '';
+        tmpl = Template.ModuleUploadList.render({
+            NAME: fileData.file.name,
+            KEY: fileData.key,
+            SIZE: formatFileSize(fileData.file.size),
+            STATUS: '等待',
+            ID: fileData.id
+        });
+        upload.listElem.append(tmpl);
+    };
+
+    Upload.run = function run() {
+        var file, upload = this;
+        if(upload.ctrl) {
+            return;
+        } else {
+            upload.ctrl = true;
+            file = upload.getFile();
+            if(file === null) {
+                upload.ctrl = false;
+                $('.upload-list-switch').trigger('toggleActive', ['off']);
                 return;
             } else {
-                upload.ctrl = true;
-                file = upload.getFile();
-                if (file === null) {
-                    // 上传队列已空
-                    upload.ctrl = false;
-                    return;
-                } else {
-                    file.service.uploadFile(file.bucket, file.key, file.file, file.id)
-                        .then(function() {
-                            upload.ctrl = false;
-                            setTimeout(function() {
-                                upload.run.call(upload);
-                            }, 0);
-                        }, function() {
-                            // 可在这里加入稍后重现上传
-                            if (!file.retry || file.retry <= 2) {
-                                if (file.retry)
-                                    file.retry++;
-                                else
-                                    file.retry = 1;
-                                upload.fileList.push(file);
-                            }
-                            $('#upload-' + file.id).find('.list-placeholder').css('background-color', '#E33E3E');
-                            upload.ctrl = false;
-                            setTimeout(function() {
-                                upload.run.call(upload);
-                            }, 0);
-                        });
-                }
+                $('.upload-list-switch').trigger('toggleActive', ['on']);
+                file.service.createObject(file.bucket, file.key, file.file, file.id)
+                    .done(function() {
+                        upload.ctrl = false;
+                        setTimeout(function() {
+                            upload.run.call(upload);
+                        }, 0);
+                        globplugin.refreshView();
+                    })
+                    .fail(function(err) {
+                        if(!file.retry || file.retry <= 2) {
+                            file.retry = !!file.retry ? (file.retry + 1) : 1;
+                            upload.filesList.push(file);
+                        }
+                        $('#upload-' + file.id).find('.list-placeholder').css('background-color', '#E33E3E');
+                        upload.ctrl = false;
+                        setTimeout(function() {
+                            upload.run.call(upload);
+                        }, 1000);
+                    });
             }
-        },
-        insertIntoList: function(fileData) {
-            var upload = this,
-                tmpl = '';
-            tmpl = TemplateEngine(Template.ModuleUploadList, {
-                NAME: fileData.file.name,
-                KEY: fileData.key,
-                SIZE: formatFileSize(fileData.file.size),
-                STATUS: 'waiting',
-                ID: fileData.id
-            });
-            upload.listElem.append(tmpl);
-        },
-        getFile: function() {
-            var upload = this;
-            if (upload.fileList.length === 0)
-                return null;
-            else
-                return upload.fileList.shift();
         }
-    }
+    };
+
+    Upload.getFile = function getFile() {
+        var upload = this;
+        if(upload.filesList.length === 0) {
+            return null;
+        } else {
+            return upload.filesList.shift();
+        }
+    };
 
     /**
      *  对后端服务器节点的抽象, 每个Service实例对应一个后台服务, 用户和后台进行交互
@@ -795,14 +799,35 @@
     }
 
     /**
+     * 移动object
+     *
+     * @param bucket {Object}
+     * @param fromKey {String}  被移动项key
+     * @param toKey {String}  移动项key
+     */
+    Service.prototype.moveObject = function(bucket, fromKey, toKey) {
+        var service = this;
+        return $.ajax({
+            url: service.config.server + service.config.moveObject.endpoint,
+            type: service.config.moveObject.method,
+            data: {
+                bucket: bucket.Name,
+                fromKey: fromKey,
+                toKey: toKey
+            }
+        })
+    };
+
+
+    /**
      *
      * 上传文件
      */
-    Service.prototype.uploadFile = function(bucket, key, file, id) {
+    Service.prototype.createObject = function(bucket, key, file, id) {
         var service = this,
             formData = new FormData();
         formData.append('bucket', bucket.Name);
-        formData.append('key', key || '');
+        formData.append('key', key);
         formData.append('Addition', bucket.Addition);
         var elem = $('#upload-' + id),
             placeholder = elem.find('.list-placeholder').css('background-color', '#3E8BE3'),
@@ -810,10 +835,9 @@
             percent;
         formData.append('file', file);
         status.text('uploading');
-        var defer = $.Deferred();
-        $.ajax({
-            url: service.config.server + service.config.uploadObjects,
-            type: 'POST',
+        return $.ajax({
+            url: service.config.server + service.config.createObject.endpoint,
+            type:  service.config.createObject.method,
             data: formData,
             processData: false,
             contentType: false,
@@ -829,17 +853,8 @@
                     }
                 }
                 return xhr;
-            },
-            success: function(data) {
-                status.text('done');
-                defer.resolve();
-            },
-            error: function(err) {
-                status.text('failed');
-                defer.reject();
             }
         });
-        return defer.promise();
     }
 
     // 目录树
@@ -930,7 +945,12 @@
         return Traverse(node, key);
     }
 
-    // 检查两个节点是否在同一个bucket下
+    /*
+     * 检查两个节点是否在同一个bucket下
+     *
+     * @param id1 {String} 节点一的id
+     * @param id2 {String} 节点二的id
+     */
     Tree.prototype.isSameBucket = function(id1, id2) {
         var tree = this;
         var node1 = tree.find(id1),
@@ -978,7 +998,6 @@
      */
     Tree.prototype.buildServiceDom = function(service) {
         var tree = this;
-        console.log(service);
         $(Template.ServiceList.render(service)).appendTo(tree.elem);
 
         // 确保其接口正确
@@ -1024,6 +1043,11 @@
         }
     };
 
+    /**
+     * 节点查找
+     *
+     * @param id {String}
+     */
     Tree.prototype.find = function(id) {
         return this.__cache[id];
     };
@@ -1360,54 +1384,55 @@
 
                     var from = ui.draggable,
                         fromKey,
+                        fromNode,
                         to = $(this),
+                        toNode,
+                        nodeRelationship,
                         toKey;
                     if (from.hasClass('fnode-list') && to.hasClass('fnode-list')) {
                         // fnode-list   to   fnode-list
-                        // 必须为铜service下的，同bucket下的节点才可以拖动
+                        // 必须为同一service下的，同bucket下的节点才可以拖动
                         // to 必须为目录
-                        nodeRelationship = tree.isSameBucket(from.attr('data-fid'), to.attr('data-fid'));
-                        if (nodeRelationship) {
-                            // 在此处可以进行copy
-                            if (event.metaKey) {
-                                // 复制
-                                tree.copyNode(nodeRelationship[0], nodeRelationship[1]);
+                        fromNode = tree.find(from.attr('data-fid'));
+                        toNode = tree.find(to.attr('data-fid'));
+                        if(fromNode && toNode) {
+                            if(toNode.__ID === fromNode.__ID) return;
+                            nodeRelationship = tree.isSameBucket(fromNode.__ID, toNode.__ID);
+                            if(nodeRelationship) {
+                                tree.objectManipulation(fromNode.Key, toNode.Key);
                             } else {
-                                // 移动到
-                                tree.moveNode(nodeRelationship[0], nodeRelationship[1]);
+                                logger('操作错误: 所移动项必须为同一个bucket下', 'error');
                             }
                         } else {
-                            alert('所移动的文件夹必须同属一个bucket下');
-                        }
-                    } else if (from.hasClass('grid') && to.hasClass('grid')) {
-                        // 一定在同一个grid下，但还是需要检查下
-                        // to必须为目录
-                        if (to.attr('data-type') !== 'dir') {
-                            alert('接受项必须为目录')
-                        } else {
-                            if (from.attr('data-type') === 'dir') {
-                                // 目录到目录移动
-                            } else {
-                                // 文件移动到目录
-                            }
+                            logger('操作失败: 节点解析失败', 'error');
                         }
                     } else if (from.hasClass('grid') && to.hasClass('fnode-list')) {
                         // grid   to  node-list  必须为同bucket下的
-                        var fromNode = tree.resolveNodeFromKey(from.attr('data-key')),
-                            toNode = tree.find(to.attr('data-fid'));
-                        nodeRelationship = tree.isSameBucket(fromNode.attr('data-fid'), to.attr('data-fid'));
-                        if (nodeRelationship) {
-                            // 在此处可以进行copy
-                            if (event.metaKey) {
-                                // 复制
-                                tree.copyNode(nodeRelationship[0], nodeRelationship[1]);
+                        fromNode = tree.resolveNodeFromKey(from.attr('data-key'));
+                        toNode = tree.find(to.attr('data-fid'));
+                        if(!toNode) {
+                            logger('移动操作失败:无法解析节点'); return;
+                        }
+                        if(toNode && fromNode) {
+                            if(toNode.__ID === fromNode.__ID) {
+                                return;
+                            }
+                            // 同为目录
+                            nodeRelationship = tree.isSameBucket(fromNode.__ID, toNode.__ID);
+                            if (nodeRelationship) {
+                                if (event.metaKey) {
+                                    // 复制
+                                } else { // 移动到
+                                    tree.objectManipulation(from.attr('data-key'), toNode.Key);
+                                }
                             } else {
-                                // 移动到
-                                tree.moveNode(nodeRelationship[0], nodeRelationship[1]);
+                                logger('操作错误: 所移动项必须为同一个bucket下', 'error');
                             }
                         } else {
-                            alert('所移动的文件夹必须同属一个bucket下');
+                            // 文件－> 目录
+                            globplugin.objectManipulation(from.attr('data-key'), toNode.Key);
                         }
+
                     }
                 },
                 over: function(event, ui) {
@@ -1458,6 +1483,35 @@
                 child.slideToggle();
             }
 
+        }
+    };
+
+    /**
+     * 节点移动(目录的移动)
+     *
+     * @param fromKey {String}
+     * @param toKey {String}
+     */
+    Tree.prototype.objectManipulation = function(fromKey, toKey) {
+        var tree = this,
+            fromNode = tree.resolveNodeFromKey(fromKey),
+            toNode = tree.resolveNodeFromKey(toKey);
+        if (fromNode.BucketId !== toNode.BucketId) {
+            alert('Differnt Bucket');
+        } else {
+            var service = tree.find(toNode.ServiceId),
+                bucket = tree.find(toNode.BucketId);
+            service.moveObject(bucket, fromKey, toKey)
+                .done(function() {
+                    logger('目录移动成功: ' + fromNode.Name + ' -> ' + toNode.Name);
+                    // 将from 节点插入to节点
+                    tree.insertNode(toNode, fromNode);
+                    tree.__deleteNode(fromNode.__ID);
+                    globplugin.refreshView();
+                })
+                .fail(function(error) {
+                    logger(formatError(error), 'error');
+                });
         }
     };
 
@@ -2188,7 +2242,6 @@
                      loadErrorElem.text('加载错误').show();
                  } else if (num >= 0) {
                      loadedElem.text('已全部加载,共' + num + '个对象').show();
-                     console.log(loadedElem);
                  }
              }
          }()));
@@ -2457,6 +2510,31 @@
              modules.contextMenu.gridViewContext.elem.hide();
          });
 
+         $('.upload-list-switch').click(function(e) {
+             modules.UploadElem.toggle();
+         });
+
+         $('.upload-list-switch').bind('toggleActive', function(e, flag) {
+             var elem = $(this);
+             if(elem.attr('data-status') === 'on' && flag === 'on') {
+                 // 如果已经开启并且想继续开启则直接退出
+                 return;
+             } else if(elem.attr('data-status') === 'on') {
+                 elem.attr('data-status', 'off');
+             } else {
+                 // 开启
+                 elem.attr('data-status', 'on');
+                 var interval = setInterval(function() {
+                     if(elem.attr('data-status') === 'off') {
+                         clearInterval(interval);
+                         elem.find('.fm-icon').removeClass('selected');
+                     } else {
+                         elem.find('.fm-icon').toggleClass('selected');
+                     }
+                 }, 500);
+             }
+         });
+
          //log 开关
          $('.process-log').click(function(e) {
              modules.Log.toggle();
@@ -2487,32 +2565,28 @@
         plugin.toggleCheckActions();
     }
 
-    Tree.prototype.objectManipulation = function(fromKey, toKey, type) {
-        var tree = this,
-            fromNode = tree.resolveNodeFromKey(fromKey),
-            toNode = tree.resolveNodeFromKey(toKey);
-        // bucket 不同
-        if (fromNode.BucketId !== toNode.BucketId) {
-            alert('Differnt Bucket');
-        } else {
-            service = tree.find(toNode.serviceId),
-                bucket = tree.find(toNode.bucketId);
-            service.moveObject(bucket, fromKey, tokey)
-        }
-
-    }
-
+    /**
+     * 文件移动到目录中
+     *
+     */
     Plugin.prototype.objectManipulation = function(fromKey, toKey, type) {
+        console.log(fromKey, toKey);
         var plugin = this,
             tree = Tree.instance(),
-            env = tree.resolveNodeFromKey(toKey);
-        if (env) {
-            if (type)
-                env.service.moveObject(env.bucket, fromKey, toKey)
-            else
-                env.service.copyObject(env.bucket, fromKey, toKey)
+            env = tree.resolveNodeFromKey(toKey) || {},
+            serviceNode = tree.find(env.ServiceId),
+            bucketNode = tree.find(env.BucketId);
+        if (env && serviceNode && bucketNode) {
+            serviceNode.moveObject(bucketNode, fromKey, toKey)
+                .done(function() {
+                    logger('文件移动成功:' + fromKey + ' -> ' + toKey, 'success');
+                    plugin.refreshView();
+                })
+                .fail(function(error) {
+                    logger(formatError(error), 'error');
+                });
         } else {
-            alert('移动失败');
+            logger('无法解析节点', 'error');
         }
     }
 
@@ -2546,7 +2620,6 @@
             $.each(data.files, function(index) {
                 file = data.files[index];
                 suffix = getSuffix(file.Name || file.Key);
-                console.log('suffix = ', suffix);
                 tmpl += Template.ModuleListViewLi.render({
                     FILE_MODIFIED: formatDate(file.LastModified, 'yyyy-MM-dd') || '-',
                     FILE_SIZE: formatFileSize(file.Size) || '-',
@@ -2571,6 +2644,7 @@
         var plugin = this,
             modules = plugin.modules,
             gridContent = plugin.modules.gridViewContent,
+            tree = Tree.instance(),
             tmpl = '',
             src,
             suffix, folder, file,
@@ -2637,9 +2711,11 @@
                     if (to.attr('data-suffix') !== 'dir') {
                         alert('接受项必须为目录');
                     } else {
-                        if (from.attr('data-type') === 'dir') {
+                        if (from.attr('data-suffix') === 'dir') {
+                            // 目录move 到目录
                             tree.objectManipulation(from.attr('data-key'), to.attr('data-key'), event.metaKey);
                         } else {
+                            // 文件move 到目录
                             plugin.objectManipulation(from.attr('data-key'), to.attr('data-key'), event.metaKey);
                         }
                     }
@@ -2676,11 +2752,11 @@
             logger('非目录不能打开', 'error');
         }
 
-        // @TODO 删除选中项目
         plugin.clearCheckActions();
 
     }
 
+    var globplugin;
     // 导出配置接口
     $.fn.fileManager = function(params) {
         var fMWrapper = $(this).find('.fManagerWrapper'),
@@ -2691,11 +2767,12 @@
             $(this).append(fMWrapper);
         }
         plugin = fMWrapper.data('plugin');
-
         if (!plugin) {
             plugin = new Plugin(fMWrapper, params);
+            globplugin = plugin;
             fMWrapper.data('plugin', plugin);
         }
+
         return fMWrapper;
     };
 

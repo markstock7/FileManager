@@ -253,6 +253,17 @@ LocalCloud.prototype.reNameObject = function reNameObject(object, options) {
         });
 }
 
+LocalCloud.prototype.uploadFile = function uploadFile(object, options) {
+    var params = ['bucket', 'key', 'path'], _this = this;
+    return this.validateOptions(object, params)
+        .then(function(object) {
+            return fs.renameAsync(path.resolve(object.path), path.join(object.keyPath, object.originalname))
+                .then(function() {
+                    return path.join(object.key, object.originalname);
+                });
+        });
+};
+
 LocalCloud.prototype.mvObject = function mvObject(object, options) {
     var params = ['bucket', 'toKey', 'fromKey'],
         toKeyPath,
@@ -274,16 +285,16 @@ LocalCloud.prototype.mvObject = function mvObject(object, options) {
             }
 
             if(!fs.existsSync(toKeyPath)) {
-                return Project.reject(new errors.ValidationError(toKeyPath + ' is not exist'));
+                return Promise.reject(new errors.ValidationError(toKeyPath + ' is not exist'));
             } else {
                 toKeyStat = fs.statSync(toKeyPath);
                 if(!toKeyStat.isDirectory()) {
-                    return Project.reject(new erors.ValidationError(toKeyPath + ' must be a directory'));
+                    return Promise.reject(new erors.ValidationError(toKeyPath + ' must be a directory'));
                 }
             }
 
             if(!fs.existsSync(fromKeyPath)) {
-                return Project.reject(new errors.ValidationError(fromKeyPath + 'is not exist'));
+                return Promise.reject(new errors.ValidationError(fromKeyPath + 'is not exist'));
             } else {
                 fromKeyStat = fs.statSync(fromKeyPath);
                 fromKeyBase = path.basename(fromKeyPath);
