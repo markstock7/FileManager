@@ -57,7 +57,6 @@ LocalCloud = function LocalCloud(settings) {
         buckets = [];
     this.settings = settings;
     this.buckets = {};
-    console.log(settings);
     if(buckets) {
         for(i = 0, len = buckets.length; i < len; i++) {
             bucket = buckets[i];
@@ -143,7 +142,6 @@ LocalCloud.prototype.listBuckets = function listBuckets() {
 
 LocalCloud.prototype.listFolders = function listFolders(options) {
     var params = ['bucket', 'key'],folders=[];
-    console.log(options);
     return this.validateOptions(options, params, 'folder')
         .then(function then(options) {
             return fs.readdirAsync(options.keyPath)
@@ -307,6 +305,16 @@ LocalCloud.prototype.mvObject = function mvObject(object, options) {
                 });
 
 
+        });
+}
+
+LocalCloud.prototype.downloadFile = function downloadFile(options, req, res) {
+    var params = ['bucket', 'key'],  _this = this;
+    console.log(options);
+    this.validateOptions(options, params)
+        .then(function(options) {
+            console.log(options.keyPath);
+            res.download(options.keyPath);
         });
 }
 module.exports = new LocalCloud(config.localCloudSettings);

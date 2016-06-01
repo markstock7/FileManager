@@ -23,5 +23,7 @@ module.exports = function(router) {
     // fromkey
     router.post('/api/localCloud/object', apiHeader.http(localCloud.mvObject));
 
-    router.post('/api/localCloud/file',upload.single('file'), apiHeader.http(localCloud.uploadFile))
+    router.post('/api/localCloud/file',upload.single('file'), apiHeader.http(localCloud.uploadFile));
+
+    router.get('/api/localCloud/object', localCloud.downloadFile);
 };

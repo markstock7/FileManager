@@ -14,7 +14,7 @@ http = function http(apiMethod, keepReq, keepRes) {
             options = {};
         }
 
-        return apiMethod(object, options).tap(function onSuccess(response) {
+        return apiMethod(object, options, req, res).tap(function onSuccess(response) {
             return addHeaders(apiMethod, req, res, (response || {}));
         }).then(function then(response) {
             res.json(response || {});

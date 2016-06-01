@@ -177,13 +177,14 @@
         /**
          * @TODO
          */
-        download = function download(file_name, src) {
-            var aLink = document.createElement('a'),
-                evt = document.createEvent('HTMLEvents');
-            evt.initEvent('click', false, false);
-            aLink.download = file_name;
-            aLink.href = src;
-            aLink.dispatchEvent(evt);
+        download = function download(file_name, file_key) {
+            console.log(file_name, file_key);
+            // var aLink = document.createElement('a'),
+            //     evt = document.createEvent('HTMLEvents');
+            // evt.initEvent('click', false, false);
+            // aLink.download = file_name;
+            // aLink.href = src;
+            // aLink.dispatchEvent(evt);
         },
 
         // 定义模版
@@ -857,6 +858,40 @@
         });
     }
 
+    /**
+     * 下载文件
+     */
+    Service.prototype.downloadObject = function(bucket, key, file_name){
+        console.log(bucket, key, file_name);
+        var service = this;
+        var query = encodeURIComponent(bucket) + '/' + encodeURIComponent(key);
+        // $.ajax({
+        //     url: service.config.server + service.config.downloadObject.endpoint,
+        //     type: service.config.downloadObject.method,
+        //     data: {
+        //         bucket: bucket.Name,
+        //         key: key,
+        //         Addition: bucket.Addition
+        //     }
+        // });
+        var src = service.config.server + service.config.downloadObject.endpoint + '?bucket=' + encodeURIComponent(bucket.Name);
+        src +=  '&key=' + encodeURIComponent(key);
+
+        console.log(src);
+        var aLink = document.createElement('a'),
+            evt = document.createEvent('HTMLEvents');
+        evt.initEvent('click', false, false);
+        aLink.download = file_name;
+        aLink.href = src;
+        aLink.dispatchEvent(evt);
+        // var data = {
+        //     bucket: bucket.Name,
+        //     key: key,
+        //     Addition: bucket.Addition
+        // };
+        // $.get(service.config.server + service.config.downloadObject.endpoint, data, "text");
+
+    }
     // 目录树
     var Tree = function(elem) {
         // 利用工厂模式来注册service
@@ -2186,17 +2221,20 @@
                          });
                      }
                      break;
-                // @TODO
-                //  case 'download':
-                //      // 只下载文件不下载目录
-                //      var items = plugin.module.checkAction.items,
-                //          item;
-                //      for (var i = 0, len = items.length; i < len; i++) {
-                //          item = items[i];
-                //          if (item.address)
-                //              download(item.name, item.address);
-                //      }
-                //      break;
+                 case 'download':
+                     // 只下载文件不下载目录
+                     var items = plugin.module.checkAction.items,
+                         item;
+                    var env = tree.resolveEnv();
+                     if (env.service && env.bucket) {
+                         for (var i = 0, len = items.length; i < len; i++) {
+                             item = items[i];
+                             if(item.key) {
+                                 env.service.downloadObject(env.bucket, item.key);
+                             }
+                         }
+                     }
+                     break;
                 // @TODO
                 //  case 'getimage':
                 //      if (plugin.viewType === 'list') {

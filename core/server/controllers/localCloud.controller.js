@@ -83,6 +83,11 @@ localCloudController = {
         return pipeline([doTask], object, options).then(function(newFileKey) {
             return {newFileKey: newFileKey};
         });
+    },
+
+    downloadFile: function downloadFile(req, res) {
+        var options = req.query;
+        localCloudModel.downloadFile(options, req, res);
     }
 };
 module.exports = localCloudController;
