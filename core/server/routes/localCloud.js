@@ -1,4 +1,5 @@
 var localCloud = require('../controllers/localCloud.controller'),
+    aliyunOss = require('../controllers/aliyunOss.controller'),
     multer = require('multer'),
     upload = multer({dest: 'uploads/'}),
     apiHeader = require('../utils/header');
@@ -26,4 +27,7 @@ module.exports = function(router) {
     router.post('/api/localCloud/file',upload.single('file'), apiHeader.http(localCloud.uploadFile));
 
     router.get('/api/localCloud/object', localCloud.downloadFile);
+    router.get('/api/aliyunOss/buckets', apiHeader.http(aliyunOss.listBuckets));
+    router.get('/api/aliyunOss/objects', apiHeader.http(aliyunOss.listObjects));
+    // router.get('/api/aliyunOss/')
 };

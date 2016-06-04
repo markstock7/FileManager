@@ -133,7 +133,7 @@ LocalCloud.prototype.listBuckets = function listBuckets() {
             Name: name,
             // 如果为aliyun oss 则可将多余数据放入Addition中, 每次请求的时候提交
             Addition: {
-                Endpoint: bucket.Endpoint
+                Endpoint: ''
             }
         });
     });
@@ -182,11 +182,16 @@ LocalCloud.prototype.listObjects = function listObjects(options) {
                                 LastModified: stat.mtime
                             });
                         } else if(stat.isFile()) {
+                            console.log(options);
+                            var address = '/api/localCloud/object?bucket=' + encodeURIComponent(options.bucket.Name);
+                            address +=  '&key=' + encodeURIComponent(path.join(options.key, file));
+                            console.log(address);
                             objects.files.push({
                                 Key: path.join(options.key, file),
                                 Name: file,
                                 Size: stat.size,
-                                LastModified: stat.mtime
+                                LastModified: stat.mtime,
+                                address: address
                             });
                         }
                     });

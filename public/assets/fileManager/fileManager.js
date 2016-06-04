@@ -346,7 +346,7 @@
                                             </div> \
                                         </div>'),
             ModuleGridViewBox_IMG: $.templates('<div class="grid" data-suffix="{{:SUFFIX}}" data-address="{{:address}}" data-key="{{:KEY}}" data-name="{{:NAME}}"> \
-                                    <div class="thumb-large" title="{{:NAME}}" style="background:url({{:address}}) 50% 50% no-repeat;"> \
+                                    <div class="thumb-large" title="{{:NAME}}" style="background:url({{:address}});background-size: 100% 100%;"> \
                                         <div class="grid-check" node-type="chk"> \
                                             <span class="fm-icon blank_b"></span> \
                                         </div> \
@@ -954,7 +954,7 @@
 
         // 是从当前目录向下寻找，还是从根目录向下寻找
         // @TODO 修改成根据key来缓存， 提高查找速度
-        if((currentFolder && currentFolder.Key && new RegExp('^' + key).test(currentFolder.Key)) || !currentFolder) {
+        if((currentFolder && currentFolder.Key && !(new RegExp('^' + key).test(currentFolder.Key))) || !currentFolder) {
             node = currentBucket;
         } else {
             node = currentFolder;
@@ -1600,6 +1600,7 @@
                     tree.currentBucketId = fnode.BucketId;
                     if (type === 'Folder')
                         tree.currentFolderId = fid;
+                    console.log(fnode);
                     dataGetter = service.getObjects(bucket, fnode.Key);
                 }
                 dataGetter.then(function(response) {
@@ -2147,7 +2148,7 @@
              var elem = $(this),
                  key = elem.attr('data-key'),
                  suffix = elem.attr('data-suffix');
-             plugin.refreshView(key);
+             plugin.refreshView(key, suffix);
          });
 
          // 避免双击事件向上冒泡
@@ -2236,18 +2237,19 @@
                      }
                      break;
                 // @TODO
-                //  case 'getimage':
-                //      if (plugin.viewType === 'list') {
-                //          alert('请在grid模式下使用')
-                //      } else {
-                //          var items = plugin.module.checkAction.items,
-                //              item,
-                //              datas = [];
-                //          for (var i = 0, len = items.length; i < len; i++) {
-                //              datas.push(items[i].addr);
-                //          }
-                //          mkClipBoard(datas);
-                //      }
+                 case 'getimage':
+                     if (plugin.viewType === 'list') {
+                         alert('请在grid模式下使用')
+                     } else {
+                         var items = plugin.module.checkAction.items,
+                             item,
+                             datas = '';
+                         for (var i = 0, len = items.length; i < len; i++) {
+                             datas += '(' + i + ')' + items[i].address + '\n';
+                         }
+                         alert(datas);
+                        //  mkClipBoard(datas);
+                     }
 
              }
          });
@@ -2712,7 +2714,8 @@
                         NAME: file.Name,
                         address: file.address,
                         KEY: file.Key,
-                        SUFFIX: suffix
+                        SUFFIX: suffix,
+                        address: file.address
                     });
                 } else {
                     tmpl += Template.ModuleGridViewBox.render({
@@ -2769,11 +2772,16 @@
      *
      * @param key {String}
      */
-    Plugin.prototype.refreshView = function(key) {
+    Plugin.prototype.refreshView = function(key, suffix) {
         var plugin = this,
             tree = Tree.instance(),
             env;
-        if (key && key[0] !== '/') key = '/' + key;
+        if (suffix !== undefined && suffix !== 'dir') {
+          logger('非目录不能打开', 'error');
+          return;
+        }
+        console.log('key', key);
+        // if (key && key[0] !== '/') key = '/' + key;
 
         // 此处要重置tree的currentfolder
         if(key) {
@@ -2781,7 +2789,7 @@
         } else {
             env = tree.resolveEnv();
         }
-
+        console.log(env);
         if(env.folder) {
             $('#flist-' + env.folder.__ID).trigger('dblclick');
         } else if(env.bucket) {

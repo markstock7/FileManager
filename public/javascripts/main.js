@@ -47,8 +47,23 @@ $(function() {
             createObject: {
                 method: 'POST',
                 endpoint: '/api/localCloud/file'
+            },
+            downloadObject: {
+              method: 'GET',
+              endpoint: '/api/localCloud/object'
             }
 
+        }, {
+          serviceName: '阿里云OSS',
+          server: 'http://localhost:3001',
+          listBuckets: {
+              method: 'GET',
+              endpoint: '/api/aliyunOss/buckets'
+          },
+          listObjects: {
+              method: 'GET',
+              endpoint: '/api/aliyunOss/objects'
+          }
         }],
 
         //
