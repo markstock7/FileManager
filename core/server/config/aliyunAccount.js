@@ -1,6 +1,6 @@
 module.exports = {
-  accessKeyId: 'pT3KujnBPxc0ey7G',
-  secretAccessKey: 'CcHjh2y7tIFljxgUT4U8sQLctkMBHu',
+  accessKeyId: '',
+  secretAccessKey: '',
   securityToken: '',
   endpoint: [
     'http://oss-cn-hangzhou.aliyuncs.com',
